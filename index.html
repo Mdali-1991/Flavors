@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flavours Pan Asian Food | London E16</title>
+  <meta name="description" content="Authentic Pan Asian cuisine in London. Open 7 days a week, 4:30PM–11PM. Free delivery within 3 miles. Order online now." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Inter:wght@300;400;500;600&family=Satisfy&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <!-- Stripe -->
+  <script src="https://js.stripe.com/v3/"></script>
+  <!-- GSAP for animations -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <!-- Particles -->
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+</head>
+<body>
+
+<!-- ── LOADER ── -->
+<div id="loader">
+  <div class="loader-inner">
+    <div class="loader-logo">FLAVOURS</div>
+    <div class="loader-bar"><div class="loader-fill"></div></div>
+  </div>
+</div>
+
+<!-- ── NAV ── -->
+<nav id="navbar">
+  <a href="#" class="nav-brand">
+    <span class="brand-icon">🔥</span>
+    <span>FLAVOURS</span>
+    <small>PAN ASIAN FOOD</small>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#menu">Menu</a></li>
+    <li><a href="#order">Order</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+    <li><a href="#order" class="nav-cta">Order Now</a></li>
+  </ul>
+  <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- ── HERO SLIDER ── -->
+<section id="hero">
+  <div id="particles-js"></div>
+  <div class="hero-slides">
+    <div class="hero-slide active" style="background-image:url('https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=1600&q=80')">
+      <div class="slide-overlay"></div>
+      <div class="slide-content">
+        <span class="slide-tag">Authentic Thai &amp; Pan Asian</span>
+        <h1 class="hero-title">Where Every<br><em>Flavour</em> Tells<br>a Story</h1>
+        <p>Handcrafted dishes from across Asia, delivered to your door.</p>
+        <div class="hero-btns">
+          <a href="#menu" class="btn-primary">Explore Menu</a>
+          <a href="#order" class="btn-ghost">Order Online</a>
+        </div>
+      </div>
+    </div>
+    <div class="hero-slide" style="background-image:url('https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=1600&q=80')">
+      <div class="slide-overlay"></div>
+      <div class="slide-content">
+        <span class="slide-tag">Signature Curries</span>
+        <h1 class="hero-title">Bold Spices,<br><em>Rich</em> Aromas,<br>Pure Comfort</h1>
+        <p>Thai Green, Red, Panang &amp; Massaman — made from scratch daily.</p>
+        <div class="hero-btns">
+          <a href="#menu" class="btn-primary">View Curries</a>
+          <a href="#order" class="btn-ghost">Order Now</a>
+        </div>
+      </div>
+    </div>
+    <div class="hero-slide" style="background-image:url('https://images.unsplash.com/photo-1563245372-f21724e3856d?w=1600&q=80')">
+      <div class="slide-overlay"></div>
+      <div class="slide-content">
+        <span class="slide-tag">Free Delivery</span>
+        <h1 class="hero-title">London's Finest<br><em>Pan Asian</em><br>Delivered Free</h1>
+        <p>Free delivery within 3 miles. Min order £20. Open every day 4:30PM–11PM.</p>
+        <div class="hero-btns">
+          <a href="#order" class="btn-primary">Order Free Delivery</a>
+          <a href="#about" class="btn-ghost">Learn More</a>
+        </div>
+      </div>
+    </div>
+    <div class="hero-slide" style="background-image:url('https://images.unsplash.com/photo-1552566626-52f8b828add9?w=1600&q=80')">
+      <div class="slide-overlay"></div>
+      <div class="slide-content">
+        <span class="slide-tag">Halal Certified</span>
+        <h1 class="hero-title">Taste the<br><em>Magic</em> of<br>Pan Asia</h1>
+        <p>100% Halal. Fresh ingredients. Unforgettable flavours.</p>
+        <div class="hero-btns">
+          <a href="#menu" class="btn-primary">See Full Menu</a>
+          <a href="#order" class="btn-ghost">Order Pickup</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="hero-controls">
+    <button class="slide-prev" aria-label="Previous slide">&#8592;</button>
+    <div class="slide-dots" id="slideDots"></div>
+    <button class="slide-next" aria-label="Next slide">&#8594;</button>
+  </div>
+  <div class="hero-badges">
+    <div class="badge"><span class="badge-icon">🕐</span><div><strong>Open Daily</strong><small>4:30PM – 11PM</small></div></div>
+    <div class="badge"><span class="badge-icon">🚚</span><div><strong>Free Delivery</strong><small>Within 3 miles</small></div></div>
+    <div class="badge"><span class="badge-icon">✅</span><div><strong>Halal Certified</strong><small>100% Halal</small></div></div>
+    <div class="badge"><span class="badge-icon">💳</span><div><strong>10% Off</strong><small>Collection over £20</small></div></div>
+  </div>
+</section>
+
+<!-- ── MARQUEE ── -->
+<div class="marquee-wrapper">
+  <div class="marquee-track">
+    <span>🍜 Pad Thai &nbsp;•&nbsp;</span><span>🍛 Thai Green Curry &nbsp;•&nbsp;</span><span>🦐 Prawn Crackers &nbsp;•&nbsp;</span><span>🌶 Crispy Chilli Chicken &nbsp;•&nbsp;</span><span>🥟 Dim Sum &nbsp;•&nbsp;</span><span>🍦 Honeycomb Ice Cream &nbsp;•&nbsp;</span><span>🥗 Som Tom &nbsp;•&nbsp;</span><span>🍱 Nasi Goreng &nbsp;•&nbsp;</span><span>🔥 Szechuan Beef &nbsp;•&nbsp;</span><span>🍜 Pad Thai &nbsp;•&nbsp;</span><span>🍛 Thai Green Curry &nbsp;•&nbsp;</span><span>🦐 Prawn Crackers &nbsp;•&nbsp;</span><span>🌶 Crispy Chilli Chicken &nbsp;•&nbsp;</span><span>🥟 Dim Sum &nbsp;•&nbsp;</span><span>🍦 Honeycomb Ice Cream &nbsp;•&nbsp;</span>
+  </div>
+</div>
+
+<!-- ── ABOUT ── -->
+<section id="about" class="section about-section">
+  <div class="container about-grid">
+    <div class="about-images">
+      <div class="about-img-main reveal">
+        <img src="https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=700&q=80" alt="Pan Asian food" />
+      </div>
+      <div class="about-img-accent reveal delay-1">
+        <img src="https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=400&q=80" alt="Fresh ingredients" />
+      </div>
+      <div class="about-badge-float">🏆 London's Finest</div>
+    </div>
+    <div class="about-text reveal delay-2">
+      <span class="section-eyebrow">Our Story</span>
+      <h2>Passionate About<br>Authentic <em>Pan Asian</em> Cuisine</h2>
+      <p>At Flavours, we bring the vibrant streets of Bangkok, the bustling night markets of Kuala Lumpur, and the fragrant kitchens of Singapore to the heart of London E16.</p>
+      <p>Every dish is crafted from fresh, quality ingredients with authentic recipes passed through generations — halal-certified and made with love.</p>
+      <div class="about-stats">
+        <div class="stat"><strong>7</strong><span>Days Open</span></div>
+        <div class="stat"><strong>50+</strong><span>Menu Items</span></div>
+        <div class="stat"><strong>3mi</strong><span>Free Delivery</span></div>
+        <div class="stat"><strong>100%</strong><span>Halal</span></div>
+      </div>
+      <a href="#menu" class="btn-primary">View Our Menu</a>
+    </div>
+  </div>
+</section>
+
+<!-- ── MENU ── -->
+<section id="menu" class="section">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="section-eyebrow">Our Menu</span>
+      <h2>Explore Every<br><em>Flavour</em></h2>
+      <p>From fiery starters to dreamy desserts — Pan Asia on one plate.</p>
+    </div>
+
+    <!-- Category Tabs -->
+    <div class="menu-tabs reveal">
+      <button class="tab-btn active" data-cat="appetisers">Appetisers</button>
+      <button class="tab-btn" data-cat="soup">Soup</button>
+      <button class="tab-btn" data-cat="salad">Salad</button>
+      <button class="tab-btn" data-cat="noodles">Noodles</button>
+      <button class="tab-btn" data-cat="curries">Curries</button>
+      <button class="tab-btn" data-cat="rice">Rice</button>
+      <button class="tab-btn" data-cat="sides">Side Dishes</button>
+      <button class="tab-btn" data-cat="specials">Specials</button>
+      <button class="tab-btn" data-cat="desserts">Desserts</button>
+      <button class="tab-btn" data-cat="drinks">Drinks</button>
+      <button class="tab-btn" data-cat="kids">Kids Menu</button>
+    </div>
+
+    <!-- Menu Panels -->
+    <div id="menuPanels"></div>
+  </div>
+</section>
+
+<!-- ── ORDER ── -->
+<section id="order" class="section order-section">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="section-eyebrow">Place Your Order</span>
+      <h2>Order Online<br><em>Instantly</em></h2>
+    </div>
+    <div class="order-grid">
+      <div class="order-form-card reveal">
+        <h3>Your Order</h3>
+        <div id="cartItems" class="cart-items"><p class="cart-empty">Your cart is empty. Browse the menu above!</p></div>
+        <div class="cart-total"><span>Total:</span><strong id="cartTotal">£0.00</strong></div>
+
+        <div class="order-details">
+          <label>Full Name<input type="text" id="custName" placeholder="Jane Smith" /></label>
+          <label>Phone<input type="tel" id="custPhone" placeholder="07700 000000" /></label>
+          <label>Email<input type="email" id="custEmail" placeholder="you@email.com" /></label>
+          <label>Order Type
+            <select id="orderType">
+              <option value="delivery">Delivery (Free within 3 miles)</option>
+              <option value="collection">Collection (10% off over £20)</option>
+            </select>
+          </label>
+          <label id="addressLabel">Delivery Address<input type="text" id="custAddress" placeholder="9 Pier Road, London E16..." /></label>
+          <label>Special Instructions<textarea id="custNotes" placeholder="Allergies, spice level, etc."></textarea></label>
+        </div>
+
+        <div class="payment-options">
+          <button class="btn-primary full-w" id="stripePayBtn">💳 Pay by Card (Stripe)</button>
+          <button class="btn-ghost full-w" id="cashPayBtn">💵 Pay Cash on Collection/Delivery</button>
+        </div>
+        <div id="paymentMessage"></div>
+        <div id="stripe-card-element" class="stripe-card" style="display:none;"></div>
+        <button id="confirmPayBtn" class="btn-primary full-w" style="display:none;margin-top:12px;">Confirm &amp; Pay</button>
+      </div>
+      <div class="order-info reveal delay-1">
+        <div class="info-card">
+          <h4>🕐 Opening Hours</h4>
+          <p>Monday – Sunday<br><strong>4:30 PM – 11:00 PM</strong></p>
+        </div>
+        <div class="info-card">
+          <h4>🚚 Delivery Info</h4>
+          <p>Free delivery within 3 miles<br>Min order <strong>£20</strong><br>£2 charge below £20 (min spend £10)</p>
+        </div>
+        <div class="info-card">
+          <h4>📍 Collection</h4>
+          <p>9 Pier Road<br>London E16 2JJ<br><strong>10% off</strong> orders over £20</p>
+        </div>
+        <div class="info-card">
+          <h4>📞 Call Us</h4>
+          <a href="tel:02038839233" class="phone-link">020 3883 9233</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── MAP & CONTACT ── -->
+<section id="contact" class="section">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="section-eyebrow">Find Us</span>
+      <h2>Visit <em>Flavours</em></h2>
+    </div>
+    <div class="contact-grid">
+      <div class="map-wrapper reveal">
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2483.1!2d0.0202!3d51.5030!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x487602a46d72b8c1%3A0x0!2s9+Pier+Rd%2C+London+E16+2JJ!5e0!3m2!1sen!2suk!4v1700000000000"
+          width="100%" height="420" style="border:0;border-radius:16px;" allowfullscreen="" loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          title="Flavours Pan Asian Food location">
+        </iframe>
+      </div>
+      <div class="contact-details reveal delay-1">
+        <div class="contact-item">
+          <span class="c-icon">📍</span>
+          <div><strong>Address</strong><p>9 Pier Road, London E16 2JJ</p></div>
+        </div>
+        <div class="contact-item">
+          <span class="c-icon">📞</span>
+          <div><strong>Phone</strong><a href="tel:02038839233"><p>020 3883 9233</p></a></div>
+        </div>
+        <div class="contact-item">
+          <span class="c-icon">✉️</span>
+          <div><strong>Email</strong><a href="mailto:info@flavoursofpanasia.co.uk"><p>info@flavoursofpanasia.co.uk</p></a></div>
+        </div>
+        <div class="contact-item">
+          <span class="c-icon">🌐</span>
+          <div><strong>Website</strong><p>www.flavoursofpanasia.co.uk</p></div>
+        </div>
+        <div class="contact-item">
+          <span class="c-icon">🕐</span>
+          <div><strong>Hours</strong><p>Every day: 4:30 PM – 11:00 PM</p></div>
+        </div>
+        <div class="social-links">
+          <a href="https://www.tiktok.com/@flavourspanasia" target="_blank" rel="noopener" class="social-btn tiktok" aria-label="TikTok">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.31 6.31 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.73a8.22 8.22 0 004.8 1.53V6.82a4.85 4.85 0 01-1.03-.13z"/></svg>
+          </a>
+          <a href="https://www.instagram.com/flavourspanasia" target="_blank" rel="noopener" class="social-btn instagram" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+          </a>
+          <a href="https://www.youtube.com/@flavourspanasia" target="_blank" rel="noopener" class="social-btn youtube" aria-label="YouTube">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+          </a>
+          <a href="https://x.com/flavourspanasia" target="_blank" rel="noopener" class="social-btn twitter" aria-label="X / Twitter">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </a>
+          <a href="https://www.facebook.com/flavourspanasia" target="_blank" rel="noopener" class="social-btn facebook" aria-label="Facebook">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── TABLE BOOKING ── -->
+<section id="booking" class="section booking-section">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="section-eyebrow">Reservations</span>
+      <h2>Book a <em>Table</em></h2>
+      <p>Reserve your spot at Flavours Pan Asian Food.</p>
+    </div>
+    <form class="booking-form reveal" id="bookingForm" onsubmit="submitBooking(event)">
+      <div class="form-row">
+        <label>Full Name<input type="text" id="bName" placeholder="Your name" required /></label>
+        <label>Phone<input type="tel" id="bPhone" placeholder="07700 000000" required /></label>
+      </div>
+      <div class="form-row">
+        <label>Date<input type="date" id="bDate" required /></label>
+        <label>Time<input type="time" id="bTime" min="16:30" max="22:30" required /></label>
+      </div>
+      <div class="form-row">
+        <label>Guests
+          <select id="bGuests">
+            <option>1</option><option>2</option><option>3</option><option>4</option>
+            <option>5</option><option>6</option><option>7</option><option>8+</option>
+          </select>
+        </label>
+        <label>Special Requests<input type="text" id="bNotes" placeholder="Allergies, celebration, etc." /></label>
+      </div>
+      <button type="submit" class="btn-primary full-w">Reserve Table</button>
+      <div id="bookingMsg"></div>
+    </form>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="container footer-grid">
+    <div class="footer-brand">
+      <div class="footer-logo">🔥 FLAVOURS<br><small>PAN ASIAN FOOD</small></div>
+      <p>Authentic Pan Asian cuisine in the heart of London. Halal certified. Open daily.</p>
+      <div class="footer-social">
+        <a href="https://www.tiktok.com/@flavourspanasia" target="_blank" rel="noopener" aria-label="TikTok">TikTok</a>
+        <a href="https://www.instagram.com/flavourspanasia" target="_blank" rel="noopener" aria-label="Instagram">Instagram</a>
+        <a href="https://www.youtube.com/@flavourspanasia" target="_blank" rel="noopener" aria-label="YouTube">YouTube</a>
+        <a href="https://x.com/flavourspanasia" target="_blank" rel="noopener" aria-label="X">X</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h5>Quick Links</h5>
+      <ul>
+        <li><a href="#menu">Menu</a></li>
+        <li><a href="#order">Order Online</a></li>
+        <li><a href="#booking">Book a Table</a></li>
+        <li><a href="#contact">Find Us</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h5>Contact</h5>
+      <ul>
+        <li><a href="tel:02038839233">020 3883 9233</a></li>
+        <li><a href="mailto:info@flavoursofpanasia.co.uk">info@flavoursofpanasia.co.uk</a></li>
+        <li>9 Pier Road, London E16 2JJ</li>
+        <li>Mon–Sun: 4:30PM – 11PM</li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h5>Policies</h5>
+      <ul>
+        <li>Allergen info: please ask staff</li>
+        <li>Halal certified</li>
+        <li>Free delivery within 3 miles</li>
+        <li>10% off collection over £20</li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 Flavours Pan Asian Food. All rights reserved. | 9 Pier Road, London E16 2JJ</p>
+    <div class="payment-icons">💳 Visa &nbsp; Mastercard &nbsp; Amex &nbsp; Cash</div>
+  </div>
+</footer>
+
+<!-- Floating Order Button -->
+<a href="#order" class="fab-order" id="fabOrder">🛒 Order Now</a>
+
+<script src="script.js"></script>
+</body>
+</html>
