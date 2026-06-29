@@ -4,7 +4,7 @@
 Gateway Qualifications Level 5 Diploma in Web Application Development  
 Unit Number: A/650/3526 | Credit Value: 16 | GLH: 152
 
-**Live site:** [https://flavours-pan-asian.netlify.app](https://flavours-pan-asian.netlify.app)  
+**Live site:** [https://flavoursfood.netlify.app](https://flavoursfood.netlify.app/)  
 **GitHub Repository:** [https://github.com/md077ali/flavers](https://github.com/md077ali/flavers)  
 **Student:** Mohammed Ali  
 **Date:** June 2026
