@@ -518,7 +518,7 @@ The screenshots below were captured from the live Netlify deployment and confirm
 
 #### US-3 — Halal certification and allergen info
 
-![Hero info strip showing Halal Certified badge](assets/img/screenshot-halal.png)
+![Hero info strip showing Halal Certified badge](assets/img/screenshot-halal.jpeg)
 
 *Hero info strip (bottom of hero section) shows four trust badges: Open Daily 4:30PM–11PM, Free Delivery within 3 miles, Halal Certified 100% Halal, and 10% Off Collection over £20. Halal status is immediately visible without scrolling.*
 
