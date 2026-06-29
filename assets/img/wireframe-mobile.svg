@@ -1,0 +1,176 @@
+<svg viewBox="0 0 920 640" xmlns="http://www.w3.org/2000/svg" font-family="Arial, sans-serif">
+  <rect width="920" height="640" fill="#F6F6F6"/>
+  <text x="460" y="18" text-anchor="middle" font-size="11" fill="#AAAAAA" font-weight="bold" letter-spacing="1">WIREFRAME — MOBILE RESPONSIVE VIEWS (375px)</text>
+
+  <!-- ── DEVICE 1: Mobile Hero ── -->
+  <text x="115" y="46" text-anchor="middle" font-size="10" fill="#888888" font-weight="bold">① Hero (mobile)</text>
+  <!-- Phone outline -->
+  <rect x="35" y="55" width="160" height="320" fill="#FFFFFF" stroke="#CCCCCC" rx="16" stroke-width="2"/>
+  <!-- Status bar -->
+  <rect x="35" y="55" width="160" height="20" fill="#E8E8E8" rx="16"/>
+  <rect x="35" y="65" width="160" height="10" fill="#E8E8E8"/>
+
+  <!-- Hamburger nav -->
+  <rect x="42" y="78" width="146" height="32" fill="#E2E2E2" stroke="#CCCCCC"/>
+  <rect x="50" y="85" width="50" height="16" fill="#CACACA" rx="2"/>
+  <text x="75" y="96" text-anchor="middle" font-size="7" fill="#555">🔥 FLAVOURS</text>
+  <!-- Hamburger icon -->
+  <line x1="168" y1="87" x2="180" y2="87" stroke="#666" stroke-width="2"/>
+  <line x1="168" y1="92" x2="180" y2="92" stroke="#666" stroke-width="2"/>
+  <line x1="168" y1="97" x2="180" y2="97" stroke="#666" stroke-width="2"/>
+
+  <!-- Hero image -->
+  <rect x="42" y="112" width="146" height="110" fill="#D5D5D5"/>
+  <line x1="42" y1="112" x2="188" y2="222" stroke="#C0C0C0"/>
+  <line x1="188" y1="112" x2="42" y2="222" stroke="#C0C0C0"/>
+
+  <!-- Hero text stacked -->
+  <rect x="54" y="145" width="120" height="10" fill="#BBBBBB" rx="2"/>
+  <rect x="58" y="160" width="110" height="10" fill="#BBBBBB" rx="2"/>
+  <rect x="62" y="175" width="100" height="8" fill="#CCCCCC" rx="2"/>
+  <!-- CTA full-width on mobile -->
+  <rect x="50" y="190" width="136" height="22" fill="#777777" rx="11"/>
+  <text x="118" y="205" text-anchor="middle" font-size="8" fill="#FFF">Explore Menu</text>
+  <rect x="50" y="216" width="136" height="22" fill="none" stroke="#888" stroke-width="1.5" rx="11"/>
+  <text x="118" y="231" text-anchor="middle" font-size="8" fill="#666">Order Online</text>
+
+  <!-- Info badges stacked 2x2 -->
+  <rect x="42" y="240" width="68" height="38" fill="#EBEBEB" stroke="#CCC" rx="3"/>
+  <text x="76" y="255" text-anchor="middle" font-size="7" fill="#555">🕐 Open Daily</text>
+  <text x="76" y="268" text-anchor="middle" font-size="6.5" fill="#777">4:30–11PM</text>
+
+  <rect x="118" y="240" width="68" height="38" fill="#EBEBEB" stroke="#CCC" rx="3"/>
+  <text x="152" y="255" text-anchor="middle" font-size="7" fill="#555">🚚 Delivery</text>
+  <text x="152" y="268" text-anchor="middle" font-size="6.5" fill="#777">Free 3mi</text>
+
+  <rect x="42" y="283" width="68" height="38" fill="#EBEBEB" stroke="#CCC" rx="3"/>
+  <text x="76" y="298" text-anchor="middle" font-size="7" fill="#555">✅ Halal</text>
+  <text x="76" y="311" text-anchor="middle" font-size="6.5" fill="#777">Certified</text>
+
+  <rect x="118" y="283" width="68" height="38" fill="#EBEBEB" stroke="#CCC" rx="3"/>
+  <text x="152" y="298" text-anchor="middle" font-size="7" fill="#555">💳 10% Off</text>
+  <text x="152" y="311" text-anchor="middle" font-size="6.5" fill="#777">Collection</text>
+
+  <!-- annotation -->
+  <text x="115" y="386" text-anchor="middle" font-size="8" fill="#AAAAAA">Hamburger nav</text>
+  <text x="115" y="397" text-anchor="middle" font-size="8" fill="#AAAAAA">at &lt;768px</text>
+
+  <!-- ── DEVICE 2: Mobile Menu ── -->
+  <text x="380" y="46" text-anchor="middle" font-size="10" fill="#888888" font-weight="bold">② Menu tabs (mobile)</text>
+  <rect x="300" y="55" width="160" height="320" fill="#FFFFFF" stroke="#CCCCCC" rx="16" stroke-width="2"/>
+  <rect x="300" y="55" width="160" height="20" fill="#E8E8E8" rx="16"/>
+  <rect x="300" y="65" width="160" height="10" fill="#E8E8E8"/>
+
+  <!-- Scrollable tab strip -->
+  <rect x="308" y="78" width="146" height="26" fill="#F0F0F0" stroke="#DDD" rx="3"/>
+  <rect x="312" y="82" width="55" height="18" fill="#777" rx="3"/>
+  <text x="339" y="94" text-anchor="middle" font-size="7" fill="#FFF">Appetisers</text>
+  <rect x="372" y="82" width="36" height="18" fill="none" stroke="#CCC" rx="3"/>
+  <text x="390" y="94" text-anchor="middle" font-size="7" fill="#666">Soup</text>
+  <rect x="412" y="82" width="36" height="18" fill="none" stroke="#CCC" rx="3"/>
+  <text x="430" y="94" text-anchor="middle" font-size="7" fill="#666">Salad</text>
+  <text x="452" y="94" font-size="7" fill="#AAAAAA">→</text>
+  <text x="354" y="112" text-anchor="middle" font-size="7" fill="#AAAAAA">scrolls horizontally</text>
+
+  <!-- Full-width cards on mobile -->
+  <rect x="308" y="118" width="146" height="80" fill="#FFF" stroke="#DDD" rx="4"/>
+  <rect x="308" y="118" width="146" height="36" fill="#E2E2E2" rx="4"/>
+  <text x="338" y="140" font-size="14">🥟</text>
+  <text x="380" y="154" font-size="7" fill="#AAAAAA" text-anchor="middle">Food image</text>
+  <rect x="316" y="160" width="100" height="8" fill="#EEE" rx="2"/>
+  <text x="316" y="168" font-size="7" fill="#444" font-weight="bold">Veg Spring Roll</text>
+  <text x="316" y="187" font-size="8" fill="#555" font-weight="bold">£5.50</text>
+  <rect x="388" y="181" width="58" height="18" fill="#777" rx="9"/>
+  <text x="417" y="193" text-anchor="middle" font-size="7" fill="#FFF">+ Add</text>
+
+  <rect x="308" y="204" width="146" height="80" fill="#FFF" stroke="#DDD" rx="4"/>
+  <rect x="308" y="204" width="146" height="36" fill="#E2E2E2" rx="4"/>
+  <text x="338" y="226" font-size="14">🍗</text>
+  <text x="316" y="246" font-size="7" fill="#444" font-weight="bold">Satay Chicken</text>
+  <text x="316" y="273" font-size="8" fill="#555" font-weight="bold">£6.95</text>
+  <rect x="388" y="267" width="58" height="18" fill="#777" rx="9"/>
+  <text x="417" y="279" text-anchor="middle" font-size="7" fill="#FFF">+ Add</text>
+
+  <rect x="308" y="290" width="146" height="78" fill="#FFF" stroke="#DDD" rx="4"/>
+  <rect x="308" y="290" width="146" height="36" fill="#E2E2E2" rx="4"/>
+  <text x="338" y="312" font-size="14">🦐</text>
+  <text x="316" y="332" font-size="7" fill="#444" font-weight="bold">Tempura Tiger Prawn</text>
+  <text x="316" y="357" font-size="8" fill="#555" font-weight="bold">£7.95</text>
+  <rect x="388" y="351" width="58" height="18" fill="#777" rx="9"/>
+  <text x="417" y="363" text-anchor="middle" font-size="7" fill="#FFF">+ Add</text>
+
+  <text x="380" y="386" text-anchor="middle" font-size="8" fill="#AAAAAA">1-column grid</text>
+  <text x="380" y="397" text-anchor="middle" font-size="8" fill="#AAAAAA">full-width cards</text>
+
+  <!-- ── DEVICE 3: Mobile Order Form ── -->
+  <text x="645" y="46" text-anchor="middle" font-size="10" fill="#888888" font-weight="bold">③ Order form (mobile)</text>
+  <rect x="565" y="55" width="160" height="320" fill="#FFFFFF" stroke="#CCCCCC" rx="16" stroke-width="2"/>
+  <rect x="565" y="55" width="160" height="20" fill="#E8E8E8" rx="16"/>
+  <rect x="565" y="65" width="160" height="10" fill="#E8E8E8"/>
+
+  <!-- Cart items stacked -->
+  <rect x="573" y="78" width="146" height="22" fill="#F0F0F0" stroke="#DDD" rx="3"/>
+  <text x="646" y="93" text-anchor="middle" font-size="7" fill="#444444">Cart: 3 items — £38.80</text>
+
+  <!-- Stacked form fields (single column on mobile) -->
+  <text x="581" y="116" font-size="7" fill="#666">Full Name</text>
+  <rect x="573" y="119" width="146" height="22" fill="#F8F8F8" stroke="#CCC" rx="3"/>
+  <text x="581" y="134" font-size="7" fill="#AAAAAA">Jane Smith</text>
+
+  <text x="581" y="153" font-size="7" fill="#666">Phone</text>
+  <rect x="573" y="156" width="146" height="22" fill="#F8F8F8" stroke="#CCC" rx="3"/>
+  <text x="581" y="171" font-size="7" fill="#AAAAAA">07700 000000</text>
+
+  <text x="581" y="190" font-size="7" fill="#666">Email</text>
+  <rect x="573" y="193" width="146" height="22" fill="#F8F8F8" stroke="#CCC" rx="3"/>
+
+  <text x="581" y="227" font-size="7" fill="#666">Order Type</text>
+  <rect x="573" y="230" width="146" height="22" fill="#F8F8F8" stroke="#CCC" rx="3"/>
+  <text x="581" y="245" font-size="7" fill="#555">Delivery ▼</text>
+
+  <text x="581" y="264" font-size="7" fill="#666">Delivery Address</text>
+  <rect x="573" y="267" width="146" height="22" fill="#F8F8F8" stroke="#CCC" rx="3"/>
+
+  <!-- Payment buttons full-width -->
+  <rect x="573" y="300" width="146" height="28" fill="#666666" rx="14"/>
+  <text x="646" y="318" text-anchor="middle" font-size="7" fill="#FFF" font-weight="bold">💳 Pay by Card</text>
+  <rect x="573" y="333" width="146" height="28" fill="none" stroke="#888" stroke-width="1.5" rx="14"/>
+  <text x="646" y="351" text-anchor="middle" font-size="7" fill="#666" font-weight="bold">💵 Pay Cash</text>
+
+  <text x="645" y="386" text-anchor="middle" font-size="8" fill="#AAAAAA">Single-column</text>
+  <text x="645" y="397" text-anchor="middle" font-size="8" fill="#AAAAAA">stacked form</text>
+
+  <!-- ── DEVICE 4: Open nav ── -->
+  <text x="860" y="46" text-anchor="middle" font-size="10" fill="#888888" font-weight="bold">④ Nav open</text>
+  <rect x="780" y="55" width="120" height="280" fill="#FFFFFF" stroke="#CCCCCC" rx="16" stroke-width="2"/>
+  <rect x="780" y="55" width="120" height="20" fill="#E8E8E8" rx="16"/>
+  <rect x="780" y="65" width="120" height="10" fill="#E8E8E8"/>
+
+  <rect x="786" y="78" width="108" height="24" fill="#E2E2E2" stroke="#CCC"/>
+  <text x="800" y="93" font-size="7" fill="#555">🔥 FLAVOURS</text>
+  <text x="874" y="93" font-size="9" fill="#666">✕</text>
+
+  <!-- Open nav menu overlay -->
+  <rect x="786" y="104" width="108" height="200" fill="#333333" rx="3" opacity="0.95"/>
+  <rect x="796" y="116" width="88" height="22" fill="none" stroke="#555" rx="3"/>
+  <text x="840" y="131" text-anchor="middle" font-size="8" fill="#EEE">Menu</text>
+  <rect x="796" y="142" width="88" height="22" fill="none" stroke="#555" rx="3"/>
+  <text x="840" y="157" text-anchor="middle" font-size="8" fill="#EEE">Order</text>
+  <rect x="796" y="168" width="88" height="22" fill="none" stroke="#555" rx="3"/>
+  <text x="840" y="183" text-anchor="middle" font-size="8" fill="#EEE">About</text>
+  <rect x="796" y="194" width="88" height="22" fill="none" stroke="#555" rx="3"/>
+  <text x="840" y="209" text-anchor="middle" font-size="8" fill="#EEE">Contact</text>
+  <rect x="796" y="222" width="88" height="26" fill="#777" rx="13"/>
+  <text x="840" y="239" text-anchor="middle" font-size="8" fill="#FFF" font-weight="bold">Order Now</text>
+
+  <text x="840" y="320" text-anchor="middle" font-size="8" fill="#AAAAAA">hamburger</text>
+  <text x="840" y="332" text-anchor="middle" font-size="8" fill="#AAAAAA">toggles .open</text>
+
+  <!-- Legend -->
+  <rect x="20" y="420" width="880" height="50" fill="#EEEEEE" stroke="#DDDDDD" rx="4"/>
+  <text x="460" y="440" text-anchor="middle" font-size="10" fill="#555555" font-weight="bold">Mobile Breakpoints</text>
+  <text x="460" y="458" text-anchor="middle" font-size="9" fill="#777777">&lt;768px: hamburger nav · hero content stacks · about-grid single column   |   &lt;576px: menu tabs scroll horizontal · form rows stack · cart full-width</text>
+
+  <!-- Note about touch -->
+  <text x="460" y="498" text-anchor="middle" font-size="9" fill="#AAAAAA">Touch targets: min 44×44px on all interactive elements (WCAG 2.5.5) · CSS custom properties handle spacing via clamp()</text>
+</svg>
