@@ -1,0 +1,81 @@
+<svg viewBox="0 0 920 600" xmlns="http://www.w3.org/2000/svg" font-family="Arial, sans-serif">
+  <!-- Page background -->
+  <rect width="920" height="600" fill="#F6F6F6"/>
+
+  <!-- Section label -->
+  <text x="460" y="18" text-anchor="middle" font-size="11" fill="#AAAAAA" font-weight="bold" letter-spacing="1">WIREFRAME — SECTION 1: HERO / LANDING</text>
+
+  <!-- ── NAVBAR ── -->
+  <rect x="20" y="26" width="880" height="52" fill="#E2E2E2" stroke="#C0C0C0" stroke-width="1" rx="3"/>
+  <!-- Brand -->
+  <rect x="34" y="37" width="130" height="30" fill="#CACACA" rx="3"/>
+  <text x="99" y="57" text-anchor="middle" font-size="11" fill="#555555" font-weight="bold">🔥 FLAVOURS</text>
+  <!-- Nav links -->
+  <text x="590" y="57" font-size="11" fill="#666666">Menu</text>
+  <text x="638" y="57" font-size="11" fill="#666666">Order</text>
+  <text x="688" y="57" font-size="11" fill="#666666">About</text>
+  <text x="738" y="57" font-size="11" fill="#666666">Contact</text>
+  <!-- CTA pill button -->
+  <rect x="794" y="37" width="92" height="30" fill="#888888" rx="15"/>
+  <text x="840" y="57" text-anchor="middle" font-size="10" fill="#FFFFFF" font-weight="bold">Order Now</text>
+
+  <!-- ── HERO SLIDE AREA ── -->
+  <rect x="20" y="82" width="880" height="370" fill="#D5D5D5" stroke="#BBBBBB"/>
+  <!-- Image placeholder cross -->
+  <line x1="20" y1="82" x2="900" y2="452" stroke="#C0C0C0" stroke-width="1.5"/>
+  <line x1="900" y1="82" x2="20" y2="452" stroke="#C0C0C0" stroke-width="1.5"/>
+  <text x="460" y="175" text-anchor="middle" font-size="12" fill="#999999">HERO BACKGROUND IMAGE (full-width, Unsplash)</text>
+
+  <!-- Slide content block -->
+  <rect x="260" y="190" width="400" height="195" fill="rgba(255,255,255,0.18)" stroke="none" rx="4"/>
+  <!-- Tag pill -->
+  <rect x="330" y="198" width="165" height="20" fill="#AAAAAA" rx="10"/>
+  <text x="412" y="212" text-anchor="middle" font-size="9" fill="#FFFFFF">Authentic Thai &amp; Pan Asian</text>
+  <!-- H1 lines -->
+  <rect x="290" y="226" width="340" height="22" fill="#BBBBBB" rx="2"/>
+  <text x="460" y="242" text-anchor="middle" font-size="13" fill="#444444" font-weight="bold">Where Every Flavour Tells a Story</text>
+  <rect x="310" y="254" width="300" height="14" fill="#CCCCCC" rx="2"/>
+  <text x="460" y="265" text-anchor="middle" font-size="9.5" fill="#666666">Handcrafted dishes from across Asia, delivered to your door</text>
+  <!-- CTA buttons -->
+  <rect x="312" y="280" width="126" height="38" fill="#777777" rx="19"/>
+  <text x="375" y="304" text-anchor="middle" font-size="10" fill="#FFFFFF" font-weight="bold">Explore Menu</text>
+  <rect x="450" y="280" width="126" height="38" fill="none" stroke="#888888" stroke-width="2" rx="19"/>
+  <text x="513" y="304" text-anchor="middle" font-size="10" fill="#666666" font-weight="bold">Order Online</text>
+  <!-- Prev/Next -->
+  <text x="44" y="278" font-size="22" fill="#AAAAAA">◀</text>
+  <text x="866" y="278" font-size="22" fill="#AAAAAA">▶</text>
+  <!-- Slide dots -->
+  <circle cx="442" cy="350" r="7" fill="#777777"/>
+  <circle cx="462" cy="350" r="6" fill="none" stroke="#888888" stroke-width="2"/>
+  <circle cx="480" cy="350" r="6" fill="none" stroke="#888888" stroke-width="2"/>
+  <circle cx="498" cy="350" r="6" fill="none" stroke="#888888" stroke-width="2"/>
+  <text x="460" y="375" text-anchor="middle" font-size="9" fill="#AAAAAA">← Slide controls — auto-advances every 5.5 s →</text>
+
+  <!-- Annotation arrow for slider -->
+  <text x="22" y="96" font-size="9" fill="#AAAAAA">Particles.js overlay</text>
+
+  <!-- ── INFO BADGES ── -->
+  <rect x="20" y="458" width="212" height="64" fill="#EBEBEB" stroke="#CCCCCC" stroke-width="1" rx="5"/>
+  <text x="50" y="480" font-size="18">🕐</text>
+  <text x="82" y="480" font-size="10" fill="#555555" font-weight="bold">Open Daily</text>
+  <text x="82" y="496" font-size="9" fill="#777777">4:30 PM – 11:00 PM</text>
+
+  <rect x="240" y="458" width="212" height="64" fill="#EBEBEB" stroke="#CCCCCC" stroke-width="1" rx="5"/>
+  <text x="270" y="480" font-size="18">🚚</text>
+  <text x="302" y="480" font-size="10" fill="#555555" font-weight="bold">Free Delivery</text>
+  <text x="302" y="496" font-size="9" fill="#777777">Within 3 miles</text>
+
+  <rect x="460" y="458" width="212" height="64" fill="#EBEBEB" stroke="#CCCCCC" stroke-width="1" rx="5"/>
+  <text x="490" y="480" font-size="18">✅</text>
+  <text x="522" y="480" font-size="10" fill="#555555" font-weight="bold">Halal Certified</text>
+  <text x="522" y="496" font-size="9" fill="#777777">100% Halal</text>
+
+  <rect x="680" y="458" width="212" height="64" fill="#EBEBEB" stroke="#CCCCCC" stroke-width="1" rx="5"/>
+  <text x="710" y="480" font-size="18">💳</text>
+  <text x="742" y="480" font-size="10" fill="#555555" font-weight="bold">10% Off Collection</text>
+  <text x="742" y="496" font-size="9" fill="#777777">Orders over £20</text>
+
+  <!-- Footer annotation -->
+  <text x="460" y="545" text-anchor="middle" font-size="10" fill="#AAAAAA">GSAP entrance animation on hero text · IntersectionObserver reveal on badges</text>
+  <text x="460" y="560" text-anchor="middle" font-size="10" fill="#AAAAAA">Responsive: nav collapses to hamburger at &lt;768px · hero content stacks on mobile</text>
+</svg>

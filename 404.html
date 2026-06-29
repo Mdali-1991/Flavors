@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Page Not Found | Flavours Pan Asian Food</title>
+  <meta name="description" content="The page you were looking for could not be found. Return to Flavours Pan Asian Food.">
+  <!-- Link to shared stylesheet for brand consistency (fonts, colours, base reset) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* ── 404-specific layout — overrides site-wide body defaults ── */
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+    }
+
+    /* ── Error code display ── */
+    .error-code {
+      font-size: clamp(6rem, 20vw, 10rem);
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      line-height: 1;
+      background: linear-gradient(135deg, var(--fire), var(--gold));
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .error-emoji {
+      font-size: 3rem;
+      margin: 16px 0;
+    }
+
+    .card-404 {
+      max-width: 540px;
+      width: 100%;
+    }
+
+    .card-404 h1 {
+      font-size: clamp(1.4rem, 4vw, 2rem);
+      margin-bottom: 12px;
+    }
+
+    .card-404 > p {
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 32px;
+    }
+
+    /* ── Countdown text ── */
+    #countdown {
+      font-size: 1rem;
+      color: var(--muted);
+      margin-top: 16px;
+    }
+
+    /* ── Return home button ── */
+    .btn-home {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--fire) 0%, #FF6B35 100%);
+      color: #fff;
+      padding: 14px 36px;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 1rem;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .btn-home:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(232, 64, 12, 0.4);
+    }
+
+    .btn-home:focus {
+      outline: 2px solid var(--gold);
+      outline-offset: 4px;
+    }
+
+    /* ── Footer note ── */
+    .page-note {
+      display: block;
+      margin-top: 40px;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <main class="card-404" role="main">
+    <div class="error-code" aria-label="Error 404">404</div>
+    <div class="error-emoji" aria-hidden="true">🍜</div>
+    <h1>Oops! This page went off the menu.</h1>
+    <p>
+      The page you're looking for doesn't exist or has been moved.<br>
+      Don't worry — our food is still here. You'll be taken back home shortly.
+    </p>
+
+    <!-- href is a fallback; JS uses window.location.replace() for history safety -->
+    <a href="index.html" class="btn-home" id="homeBtn">🔥 Back to Flavours</a>
+
+    <p id="countdown">
+      Redirecting in <strong id="sec">5</strong> seconds…
+    </p>
+
+    <!-- Replaced invalid <footer-note> custom element with semantic <span> -->
+    <span class="page-note">
+      Flavours Pan Asian Food · 9 Pier Road, London E16 2JJ · 020 3883 9233
+    </span>
+  </main>
+
+  <script>
+    /* Auto-redirect countdown (Unit 2, Merit M(ii))
+       window.location.replace() replaces the current history entry so
+       the browser Back button cannot return the user to the 404 page.
+       This satisfies the requirement that "users directed to a non-existent
+       page must be redirected back to the main page without using the
+       browser navigation buttons." */
+    (function () {
+      "use strict";
+      var remaining = 5;
+      var secEl = document.getElementById("sec");
+
+      var timer = setInterval(function () {
+        remaining -= 1;
+        if (secEl) { secEl.textContent = remaining; }
+        if (remaining <= 0) {
+          clearInterval(timer);
+          window.location.replace("index.html");
+        }
+      }, 1000);
+
+      /* Manual button click also uses replace() to prevent back-navigation
+         returning to the 404 page. */
+      var homeBtn = document.getElementById("homeBtn");
+      if (homeBtn) {
+        homeBtn.addEventListener("click", function (event) {
+          event.preventDefault();
+          clearInterval(timer);
+          window.location.replace("index.html");
+        });
+      }
+    }());
+  </script>
+</body>
+</html>

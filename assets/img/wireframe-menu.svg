@@ -1,0 +1,132 @@
+<svg viewBox="0 0 920 640" xmlns="http://www.w3.org/2000/svg" font-family="Arial, sans-serif">
+  <rect width="920" height="640" fill="#F6F6F6"/>
+  <text x="460" y="18" text-anchor="middle" font-size="11" fill="#AAAAAA" font-weight="bold" letter-spacing="1">WIREFRAME — SECTION 2: MENU</text>
+
+  <!-- ── SECTION HEADER ── -->
+  <text x="460" y="46" text-anchor="middle" font-size="9" fill="#AAAAAA" letter-spacing="2">OUR MENU</text>
+  <rect x="300" y="52" width="320" height="28" fill="#E0E0E0" rx="2"/>
+  <text x="460" y="71" text-anchor="middle" font-size="14" fill="#444444" font-weight="bold">Explore Every Flavour</text>
+  <rect x="340" y="86" width="240" height="12" fill="#DEDEDE" rx="2"/>
+  <text x="460" y="96" text-anchor="middle" font-size="9" fill="#888888">From fiery starters to dreamy desserts</text>
+
+  <!-- ── CATEGORY TABS ── -->
+  <rect x="20" y="112" width="880" height="42" fill="#E8E8E8" stroke="#CCCCCC" rx="4"/>
+  <!-- Active tab -->
+  <rect x="26" y="116" width="92" height="34" fill="#777777" rx="4"/>
+  <text x="72" y="137" text-anchor="middle" font-size="10" fill="#FFFFFF" font-weight="bold">Appetisers</text>
+  <!-- Other tabs -->
+  <rect x="124" y="116" width="66" height="34" fill="none" stroke="#BBBBBB" rx="4"/>
+  <text x="157" y="137" text-anchor="middle" font-size="9" fill="#666666">Soup</text>
+  <rect x="196" y="116" width="66" height="34" fill="none" stroke="#BBBBBB" rx="4"/>
+  <text x="229" y="137" text-anchor="middle" font-size="9" fill="#666666">Salad</text>
+  <rect x="268" y="116" width="72" height="34" fill="none" stroke="#BBBBBB" rx="4"/>
+  <text x="304" y="137" text-anchor="middle" font-size="9" fill="#666666">Noodles</text>
+  <rect x="346" y="116" width="70" height="34" fill="none" stroke="#BBBBBB" rx="4"/>
+  <text x="381" y="137" text-anchor="middle" font-size="9" fill="#666666">Curries</text>
+  <rect x="422" y="116" width="54" height="34" fill="none" stroke="#BBBBBB" rx="4"/>
+  <text x="449" y="137" text-anchor="middle" font-size="9" fill="#666666">Rice</text>
+  <rect x="482" y="116" width="80" height="34" fill="none" stroke="#BBBBBB" rx="4"/>
+  <text x="522" y="137" text-anchor="middle" font-size="9" fill="#666666">Side Dishes</text>
+  <rect x="568" y="116" width="70" height="34" fill="none" stroke="#BBBBBB" rx="4"/>
+  <text x="603" y="137" text-anchor="middle" font-size="9" fill="#666666">Specials</text>
+  <rect x="644" y="116" width="72" height="34" fill="none" stroke="#BBBBBB" rx="4"/>
+  <text x="680" y="137" text-anchor="middle" font-size="9" fill="#666666">Desserts</text>
+  <rect x="722" y="116" width="64" height="34" fill="none" stroke="#BBBBBB" rx="4"/>
+  <text x="754" y="137" text-anchor="middle" font-size="9" fill="#666666">Drinks</text>
+  <rect x="792" y="116" width="86" height="34" fill="none" stroke="#BBBBBB" rx="4"/>
+  <text x="835" y="137" text-anchor="middle" font-size="9" fill="#666666">Kids Menu</text>
+
+  <!-- Tab annotation -->
+  <text x="460" y="170" text-anchor="middle" font-size="9" fill="#AAAAAA">← Tab click → hide current panel, show target panel via data-cat attribute →</text>
+
+  <!-- ── CATEGORY HERO IMAGE ── -->
+  <rect x="20" y="180" width="880" height="80" fill="#D8D8D8" stroke="#BBBBBB"/>
+  <line x1="20" y1="180" x2="900" y2="260" stroke="#C8C8C8"/>
+  <line x1="900" y1="180" x2="20" y2="260" stroke="#C8C8C8"/>
+  <text x="460" y="226" text-anchor="middle" font-size="11" fill="#AAAAAA">Category hero image — lazy loaded from Unsplash</text>
+
+  <!-- ── CARD GRID — 3x2 ── -->
+  <!-- Row 1 -->
+  <!-- Card 1 -->
+  <rect x="20" y="270" width="276" height="155" fill="#FFFFFF" stroke="#DDDDDD" rx="6"/>
+  <rect x="20" y="270" width="276" height="70" fill="#E2E2E2" rx="6"/>
+  <rect x="20" y="316" width="276" height="24" fill="#E2E2E2"/>
+  <text x="40" y="295" font-size="22">🥟</text>
+  <text x="80" y="286" font-size="9" fill="#AAAAAA">Category image placeholder</text>
+  <rect x="32" y="324" width="160" height="12" fill="#EEEEEE" rx="2"/>
+  <text x="32" y="334" font-size="10" fill="#444444" font-weight="bold">Item Name</text>
+  <rect x="32" y="342" width="220" height="8" fill="#EEEEEE" rx="2"/>
+  <rect x="32" y="354" width="180" height="8" fill="#EEEEEE" rx="2"/>
+  <text x="32" y="365" font-size="9" fill="#888888">Short description text here</text>
+  <text x="36" y="410" font-size="11" fill="#555555" font-weight="bold">£6.95</text>
+  <rect x="194" y="396" width="88" height="26" fill="#777777" rx="13"/>
+  <text x="238" y="413" text-anchor="middle" font-size="10" fill="#FFFFFF">+ Add</text>
+
+  <!-- Card 2 -->
+  <rect x="322" y="270" width="276" height="155" fill="#FFFFFF" stroke="#DDDDDD" rx="6"/>
+  <rect x="322" y="270" width="276" height="70" fill="#E2E2E2" rx="6"/>
+  <rect x="322" y="316" width="276" height="24" fill="#E2E2E2"/>
+  <text x="342" y="295" font-size="22">🍗</text>
+  <rect x="334" y="324" width="160" height="12" fill="#EEEEEE" rx="2"/>
+  <text x="334" y="334" font-size="10" fill="#444444" font-weight="bold">Item Name</text>
+  <rect x="334" y="342" width="220" height="8" fill="#EEEEEE" rx="2"/>
+  <rect x="334" y="354" width="180" height="8" fill="#EEEEEE" rx="2"/>
+  <text x="334" y="365" font-size="9" fill="#888888">Short description text here</text>
+  <text x="338" y="410" font-size="11" fill="#555555" font-weight="bold">£6.95</text>
+  <rect x="496" y="396" width="88" height="26" fill="#777777" rx="13"/>
+  <text x="540" y="413" text-anchor="middle" font-size="10" fill="#FFFFFF">+ Add</text>
+
+  <!-- Card 3 -->
+  <rect x="624" y="270" width="276" height="155" fill="#FFFFFF" stroke="#DDDDDD" rx="6"/>
+  <rect x="624" y="270" width="276" height="70" fill="#E2E2E2" rx="6"/>
+  <rect x="624" y="316" width="276" height="24" fill="#E2E2E2"/>
+  <text x="644" y="295" font-size="22">🦐</text>
+  <rect x="636" y="324" width="160" height="12" fill="#EEEEEE" rx="2"/>
+  <text x="636" y="334" font-size="10" fill="#444444" font-weight="bold">Item Name</text>
+  <rect x="636" y="342" width="220" height="8" fill="#EEEEEE" rx="2"/>
+  <rect x="636" y="354" width="180" height="8" fill="#EEEEEE" rx="2"/>
+  <text x="636" y="365" font-size="9" fill="#888888">Short description text here</text>
+  <text x="640" y="410" font-size="11" fill="#555555" font-weight="bold">£7.95</text>
+  <rect x="798" y="396" width="88" height="26" fill="#777777" rx="13"/>
+  <text x="842" y="413" text-anchor="middle" font-size="10" fill="#FFFFFF">+ Add</text>
+
+  <!-- Row 2 — Noodles/Curries variant with protein selector -->
+  <!-- Protein selector bar (shown for Noodles/Curries tabs) -->
+  <rect x="20" y="438" width="880" height="38" fill="#EDF2F7" stroke="#C8D8E8" rx="4"/>
+  <text x="36" y="451" font-size="9" fill="#666666">🍽 Choose protein:</text>
+  <rect x="150" y="442" width="200" height="26" fill="#FFFFFF" stroke="#CCCCCC" rx="4"/>
+  <text x="160" y="459" font-size="9" fill="#555555">Chicken — £10.95 ▼</text>
+  <text x="380" y="459" font-size="9" fill="#555555">Beef — £12.95</text>
+  <text x="460" y="459" font-size="9" fill="#555555">Prawn — £12.95</text>
+  <text x="540" y="459" font-size="9" fill="#555555">Veg — £9.95</text>
+  <text x="610" y="459" font-size="9" fill="#555555">Tofu — £8.95</text>
+  <text x="720" y="459" font-size="9" fill="#AAAAAA">← price updates on all cards when protein changes (delegated change event)</text>
+
+  <!-- Row 2 cards (simplified) -->
+  <rect x="20" y="484" width="276" height="120" fill="#FFFFFF" stroke="#DDDDDD" rx="6"/>
+  <rect x="20" y="484" width="276" height="50" fill="#E2E2E2" rx="6"/>
+  <text x="44" y="520" font-size="9" fill="#AAAAAA">img</text>
+  <rect x="32" y="542" width="140" height="10" fill="#EEEEEE" rx="2"/>
+  <text x="32" y="552" font-size="10" fill="#444444" font-weight="bold">Pad Thai</text>
+  <text x="36" y="590" font-size="11" fill="#555555" font-weight="bold">£10.95</text>
+  <rect x="194" y="578" width="88" height="24" fill="#777777" rx="12"/>
+  <text x="238" y="594" text-anchor="middle" font-size="9" fill="#FFFFFF">+ Add</text>
+
+  <rect x="322" y="484" width="276" height="120" fill="#FFFFFF" stroke="#DDDDDD" rx="6"/>
+  <rect x="322" y="484" width="276" height="50" fill="#E2E2E2" rx="6"/>
+  <text x="346" y="520" font-size="9" fill="#AAAAAA">img</text>
+  <rect x="334" y="542" width="140" height="10" fill="#EEEEEE" rx="2"/>
+  <text x="334" y="552" font-size="10" fill="#444444" font-weight="bold">Pad Kee Mao  🌶</text>
+  <text x="338" y="590" font-size="11" fill="#555555" font-weight="bold">£10.95</text>
+  <rect x="496" y="578" width="88" height="24" fill="#777777" rx="12"/>
+  <text x="540" y="594" text-anchor="middle" font-size="9" fill="#FFFFFF">+ Add</text>
+
+  <rect x="624" y="484" width="276" height="120" fill="#FFFFFF" stroke="#DDDDDD" rx="6"/>
+  <rect x="624" y="484" width="276" height="50" fill="#E2E2E2" rx="6"/>
+  <text x="648" y="520" font-size="9" fill="#AAAAAA">img</text>
+  <text x="636" y="590" font-size="9" fill="#AAAAAA">role="button" tabindex="0" — keyboard accessible</text>
+
+  <!-- Footer note -->
+  <text x="460" y="620" text-anchor="middle" font-size="9.5" fill="#AAAAAA">Cards: role="button", tabindex="0" · Enter/Space add to cart · Delegated click/keydown on #menuPanels</text>
+  <text x="460" y="635" text-anchor="middle" font-size="9.5" fill="#AAAAAA">CSS Grid: repeat(auto-fill, minmax(280px, 1fr)) — responsive without breakpoint columns</text>
+</svg>
