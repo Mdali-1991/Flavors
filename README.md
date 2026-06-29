@@ -4,8 +4,8 @@
 Gateway Qualifications Level 5 Diploma in Web Application Development  
 Unit Number: A/650/3526 | Credit Value: 16 | GLH: 152
 
-**Live site:** [https://flavoursfood.netlify.app](https://flavoursfood.netlify.app/)  
-**GitHub Repository:** [https://github.com/Mdali-1991/Flavors](https://github.com/Mdali-1991/Flavors)  
+**Live site:** [https://flavours-pan-asian.netlify.app](https://flavours-pan-asian.netlify.app)  
+**GitHub Repository:** [https://github.com/md077ali/flavers](https://github.com/md077ali/flavers)  
 **Student:** Mohammed Ali  
 **Date:** June 2026
 
@@ -401,6 +401,16 @@ Each commit was pushed to GitHub so the full development timeline is visible in 
 
 ## Testing
 
+### Principles of Automated and Manual Testing
+
+**Manual testing** involves a human tester interacting with the application and checking that it behaves as expected. It is most appropriate when testing user experience, visual layout, accessibility (e.g. keyboard navigation, screen-reader announcements), and edge cases that are difficult to predict in advance. For this project, manual testing was the primary approach because the application is front-end only — all features involve DOM interaction, CSS rendering, and user flow, which are best verified by a real person using a real browser. Manual testing is also appropriate at the deployment stage to confirm that the hosted version matches the development version.
+
+**Automated testing** uses code (e.g. unit tests, end-to-end test frameworks like Jasmine or Cypress) to assert that specific functions return expected outputs. It is most appropriate for logic-heavy functions where inputs and outputs are predictable — for example, a price calculation function that should always return a specific total given specific quantities. Automated testing runs faster than manual testing for regression checks after code changes, but cannot easily test visual appearance, user experience, or browser-specific rendering. For this project, the JavaScript logic (cart total calculation, input validation, menu rendering) would be suitable candidates for automated unit tests; however, the core interactive features (GSAP animations, Stripe card element, Particles.js layer) cannot be meaningfully unit-tested and require manual verification.
+
+In summary: manual testing was used throughout this project for UI, accessibility, and cross-browser checks; automated tool-based testing (W3C validator, JSHint, Lighthouse) was used to verify code quality and accessibility scores.
+
+---
+
 ### Browser Compatibility
 
 | Browser | Version | OS | Result |
@@ -487,6 +497,72 @@ The screenshots below were captured from the live validation tools and confirm a
 ![JSHint — Valid JavaScript code](assets/img/js-vaidator.jpeg)
 
 *Result: "Valid JavaScript code!" — checked with `esversion: 11`, `browser: true`, `unused: true`.*
+
+---
+
+### Finished Project Screenshots (AC 3.3)
+
+The screenshots below were captured from the live Netlify deployment and confirm each user story has been implemented.
+
+#### US-1 — Hero section (new visitor landing)
+
+![Hero section — Passionate About Authentic Pan Asian Cuisine](assets/img/screenshot-hero.png)
+
+*Brand headline, "Passionate About Authentic Pan Asian Cuisine", rendered immediately on load. "See Full Menu" and "Order Pickup" CTAs visible. Carousel dot indicators show multiple hero slides. Navigation bar present with all section links.*
+
+#### US-2 — Menu tabs (category browsing)
+
+![Menu section — 11 category tabs and dish cards](assets/img/screenshot-menu.png)
+
+*11 category tabs (Appetisers, Soup, Salad, Noodles, Curries, Rice, Side Dishes, Specials, Desserts, Drinks, Kids Menu). Active tab highlighted in brand orange. Dish cards with food photography loaded asynchronously from `menu.json`.*
+
+#### US-3 — Halal certification and allergen info
+
+![Hero info strip showing Halal Certified badge](assets/img/screenshot-halal.png)
+
+*Hero info strip (bottom of hero section) shows four trust badges: Open Daily 4:30PM–11PM, Free Delivery within 3 miles, Halal Certified 100% Halal, and 10% Off Collection over £20. Halal status is immediately visible without scrolling.*
+
+#### US-4 — Mobile responsive layout (375px)
+
+![Site on 375px mobile viewport — hamburger nav open](assets/img/screenshot-mobile.png)
+
+*Hamburger icon visible in top-right. Hero content stacks vertically on narrow viewport. Menu cards render at full width. All touch targets ≥ 44 px (WCAG 2.5.5).*
+
+#### US-5 — Protein selector and live price update
+
+![Protein dropdown on noodle dish — price updates on selection](assets/img/screenshot-protein.png)
+
+*`<select>` dropdown visible on applicable noodle/rice dishes. Selecting a protein option triggers the `change` event handler (via event delegation on `#menuPanels`) and updates both the displayed price and the card's `aria-label` in real time.*
+
+#### US-6 — Cart panel and payment options
+
+![Cart side panel open showing items, total, and Stripe card element](assets/img/screenshot-cart.png)
+
+*Cart side panel slides open from the right. Itemised list of added dishes with quantities and individual prices. Running total calculated live. Stripe card input element embedded. "Pay Cash on Delivery" button below as an alternative payment path.*
+
+#### US-7 — Table booking form with validation
+
+![Booking form with inline validation message on invalid submit](assets/img/screenshot-booking.png)
+
+*Form fields: Full Name, Phone, Date, Time (constrained 16:30–22:30), Guests, Special Requests. On invalid submission, inline error message appears below the relevant field. Success confirmation message displayed after valid submit.*
+
+#### US-8 — Keyboard accessibility (visible focus ring)
+
+![Menu card showing visible keyboard focus ring](assets/img/screenshot-keyboard.png)
+
+*Visible focus outline on a dish card reached via Tab key. Cards have `tabindex="0"` and `role="button"`. Pressing Enter or Space activates the card and adds the item to cart — no mouse required.*
+
+#### US-9 — 404 custom error page
+
+![404 page showing countdown timer and return button](assets/img/screenshot-404.png)
+
+*Custom `404.html` loads when an invalid URL is visited. 5-second countdown displayed. `window.location.replace("index.html")` fires on countdown end, overwriting the history entry so Back button cannot return to the error page. Manual "Back to Flavours" button also present.*
+
+#### US-10 — Contact section
+
+![Contact section with embedded Google Map, address, phone, hours, and social links](assets/img/screenshot-contact.png)
+
+*Embedded Google Map centred on 9 Pier Road, London E16 2JJ. Address, phone, email, website, and opening hours (Every day 4:30 PM–11:00 PM) listed to the right. Five social media icon buttons (TikTok, Instagram, YouTube, X, Facebook) — all open in a new tab with `rel="noopener noreferrer"`.*
 
 ---
 
