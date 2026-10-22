@@ -1,220 +1,50 @@
 /* ============================================================
    Flavours Pan Asian Food – script.js
 
+   Page behaviour: menu loading, cart, order form, booking form,
+   hero slideshow, navigation and animations.
+
+   Loaded after (see bottom of index.html):
+     js/menu-fallback.js  → MENU_FALLBACK (offline copy of menu.json)
+     js/order-rules.js    → calculateOrderTotals(), formatPounds()
+     js/form-rules.js     → validateBooking(), validateOrderDetails(),
+                            toLocalDateString(), BOOKING_RULES
+
+   IMPORTANT: ordering, payment and booking are SIMULATED.
+   Nothing is sent to the restaurant and no card is charged.
+   Every confirmation message says so (tutor feedback, Oct 2026).
    ============================================================ */
 
+/* global MENU_FALLBACK, calculateOrderTotals, formatPounds,
+   validateBooking, validateOrderDetails, toLocalDateString, BOOKING_RULES,
+   Stripe, gsap, ScrollTrigger, particlesJS */
 "use strict";
 
 /* ── MODULE-SCOPED STATE ── */
 
 /* cart holds the current order items for the session.
-   Each entry: { name: string, price: number, qty: number } */
+   Each entry: { name: string, price: number (pounds), qty: number } */
 let cart = [];
 
 /* fetchedMenuData is populated after a successful fetch of menu.json.
    Event handlers that need pricing data (e.g. protein selects) read
-   from this rather than a static constant, demonstrating that the
-   application correctly handles the timing of asynchronous data. */
+   from this rather than a static constant. */
 let fetchedMenuData = null;
 
 /* isFetching prevents a second buildMenu() call starting before the
-   first resolves — guards against rapid Retry button clicks.
-   (Bug Log #4) */
+   first resolves — guards against rapid Retry button clicks. (Bug Log #4) */
 let isFetching = false;
 
-/* ── INLINE MENU FALLBACK ──
-   Purpose : Graceful degradation when fetch() is unavailable.
-   When    : Browsers block fetch() on the file:// protocol (local open).
-             On any HTTP server (GitHub Pages, Netlify, localhost:8080)
-             the fetch always succeeds and MENU_FALLBACK is never used.
-   Note    : Keep in sync with assets/data/menu.json if menu changes.
-   Grading : Demonstrates defensive programming and separation of data
-             from presentation — the same data schema is used whether
-             loaded remotely or from this inline constant. */
-const MENU_FALLBACK = {
-  "appetisers": {
-    "label": "Appetisers",
-    "img": "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=1200&q=80",
-    "items": [
-      { "name": "Prawn Crackers", "desc": "Thai Prawn Crackers served with sweet chilli sauce.", "price": 3.95, "emoji": "🦐" },
-      { "name": "Veg Spring Roll", "desc": "Crispy spring rolls with vegetable filling. Sweet chilli sauce.", "price": 5.50, "emoji": "🥟", "tags": ["veg"] },
-      { "name": "Chicken Spring Roll", "desc": "Crispy spring rolls packed with chicken and seasonal vegetables.", "price": 6.50, "emoji": "🥟" },
-      { "name": "Edamame (Salt & Pepper)", "desc": "Warm green soya bean pods seasoned with salt & pepper.", "price": 3.95, "emoji": "🫘", "tags": ["veg"] },
-      { "name": "Edamame (Spicy)", "desc": "Warm green soya bean pods seasoned with garlic & chilli.", "price": 3.95, "emoji": "🫘", "tags": ["hot"] },
-      { "name": "Calamari (5 pcs)", "desc": "Deep fried squid tossed in salt, paper, chilli, garlic, spring onions. House spicy mayo & togarashi.", "price": 6.95, "emoji": "🦑" },
-      { "name": "Tofu Mari (5 pcs)", "desc": "Deep fried tofu tossed in salt, paper, chilli, garlic, spring onions.", "price": 5.95, "emoji": "🟡", "tags": ["veg"] },
-      { "name": "Gyoza – Chicken/Fish", "desc": "Homemade marinated Chicken or Fish dumplings, wrapped in thin dough. Soya sauce.", "price": 6.95, "emoji": "🥟" },
-      { "name": "Gyoza – Veg", "desc": "Homemade marinated vegetable dumplings, soya sauce.", "price": 5.95, "emoji": "🥟", "tags": ["veg"] },
-      { "name": "Satay Chicken (4 pcs)", "desc": "Mildly spicy marinated chicken on skewers, creamy peanut sauce.", "price": 6.95, "emoji": "🍢" },
-      { "name": "Korean BBQ Chicken Wings (5pcs)", "desc": "Crispy fried wings with sweet Korean BBQ sauce, sesame & spring onions.", "price": 6.95, "emoji": "🍗" },
-      { "name": "Thai Sticky Chilli Wings (5pcs)", "desc": "Deep fried marinated chicken coated with house special spicy sweet & sour sauce.", "price": 6.95, "emoji": "🍗", "tags": ["hot"] },
-      { "name": "Bao Buns – Katsu Chicken", "desc": "Steamed Japanese buns with homemade coleslaw & chilli mayo.", "price": 6.95, "emoji": "🥙" },
-      { "name": "Bao Buns – Pulled BBQ Beef/Prawn", "desc": "Steamed Japanese buns with homemade coleslaw & chilli mayo.", "price": 7.95, "emoji": "🥙" },
-      { "name": "Bao Buns – Aubergine", "desc": "Steamed Japanese buns with homemade coleslaw & chilli mayo.", "price": 5.95, "emoji": "🥙", "tags": ["veg"] },
-      { "name": "Bao Buns – Sweet Potato Croquette", "desc": "Steamed Japanese buns with homemade coleslaw & chilli mayo.", "price": 5.95, "emoji": "🥙", "tags": ["veg"] },
-      { "name": "Tempura Tiger Prawn", "desc": "Best crispy tiger prawn deep-fried in breadcrumbs. House creamy spicy mayo.", "price": 7.95, "emoji": "🦐" },
-      { "name": "Tempura Soft Shell Crab", "desc": "Crispy soft shell crab deep-fried in breadcrumbs. House creamy spicy mayo.", "price": 7.95, "emoji": "🦀" },
-      { "name": "Tempura Zucchini", "desc": "Crispy zucchini deep-fried in breadcrumbs. House creamy spicy mayo.", "price": 6.95, "emoji": "🥒", "tags": ["veg"] },
-      { "name": "Thai Fish Cakes", "desc": "Fish patties with kaffir limes, lemongrass and red curry paste. Sweet chilli sauce.", "price": 6.95, "emoji": "🐟" },
-      { "name": "Dim Sum (4 pcs)", "desc": "Steamed minced prawn and chicken in wonton pastry with garlic flakes.", "price": 6.95, "emoji": "🥟" },
-      { "name": "Sesame Prawn Toast", "desc": "Minced prawn with spices on toast. Sweet chilli sauce.", "price": 6.95, "emoji": "🍞" },
-      { "name": "Sweet Chilli Chicken Bites", "desc": "Crispy chicken tossed in a tangy sweet chilli sauce.", "price": 5.95, "emoji": "🌶️", "tags": ["hot"] }
-    ]
-  },
-  "soup": {
-    "label": "Soup",
-    "img": "https://images.unsplash.com/photo-1547592180-85f173990554?w=1200&q=80",
-    "items": [
-      { "name": "Tom Yum Soup – Chicken", "desc": "Thailand's iconic hot & sour soup, vibrant balance of spicy, sour, salty & savoury. Lemongrass, mushrooms, fresh herbs.", "price": 5.95, "emoji": "🍲", "tags": ["hot"] },
-      { "name": "Tom Yum Soup – Prawn", "desc": "Hot & sour prawn soup. Lemongrass, mushrooms, fresh herbs.", "price": 6.95, "emoji": "🍲", "tags": ["hot"] },
-      { "name": "Tom Yum Soup – Veg", "desc": "Hot & sour vegetable soup. Lemongrass, mushrooms, fresh herbs.", "price": 4.95, "emoji": "🍲", "tags": ["veg", "hot"] },
-      { "name": "Tom Kha Soup", "desc": "Delightful chicken, prawn or mushroom soup rich with coconut milk, fragrant galangal.", "price": 6.95, "emoji": "🥥" }
-    ]
-  },
-  "salad": {
-    "label": "Salad",
-    "img": "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=1200&q=80",
-    "items": [
-      { "name": "Papaya Salad – Prawn", "desc": "Shredded green papaya, chilli, cherry tomatoes, cucumber, carrots, fine beans. Fresh, spicy, tangy, lime. Roasted peanuts.", "price": 10.95, "emoji": "🥗", "tags": ["hot"] },
-      { "name": "Papaya Salad – Veg", "desc": "Shredded green papaya, chilli, cherry tomatoes, cucumber, carrots, fine beans. Garlic dressing. Roasted peanuts.", "price": 8.95, "emoji": "🥗", "tags": ["veg"] },
-      { "name": "Thai Waterfall Beef Salad", "desc": "Grilled sirloin/rump, sliced. Peas, shoots, rocket, spinach, coriander, mint, red onions, chillies, sawtooth leaves, spring onions. Toasted rice powder.", "price": 11.95, "emoji": "🥩", "tags": ["hot"] }
-    ]
-  },
-  "noodles": {
-    "label": "Noodles",
-    "img": "https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=1200&q=80",
-    "pricingTable": [
-      { "protein": "Chicken", "price": "£10.95" },
-      { "protein": "Beef",    "price": "£12.95" },
-      { "protein": "Prawn",   "price": "£12.95" },
-      { "protein": "Veg",     "price": "£9.95"  },
-      { "protein": "Tofu",    "price": "£8.95"  }
-    ],
-    "items": [
-      { "name": "Pad Thai", "desc": "Thai favourite. Medium spicy wok fried flat rice noodles, egg, onion, garlic, bean sprouts, tamarind, lime, spring onions. Crushed peanuts.", "price": 10.95, "emoji": "🍜" },
-      { "name": "Pad Kee Mao", "desc": "Very Hot. Super spicy wok fried flat rice noodles, garlic, chillies, long beans, mix peppers, sweet basil (egg optional).", "price": 10.95, "emoji": "🌶️", "tags": ["hot"] },
-      { "name": "Pad Se Ew", "desc": "Stir fried flat rice noodles in soya sauce with egg and vegetables.", "price": 10.95, "emoji": "🍜" },
-      { "name": "Chow Mein", "desc": "Egg noodles, onions, carrot, cabbage, peppers, bean sprouts, spring onion stir fried in light soya, oyster sauce, sesame oil. Garnished with egg.", "price": 10.95, "emoji": "🍜" },
-      { "name": "Mee Goreng", "desc": "Malaysia's favourite street food. Spicy, tangy & delicious. Stir fried egg noodles with egg, shrimps powder, carrots, spring onions, chilli & veg.", "price": 10.95, "emoji": "🍜", "tags": ["hot"] },
-      { "name": "Singapore Noodles", "desc": "Stir-fried vermicelli noodles (mildly spicy), egg, chilli, vegetables, curry powder, Worcestershire sauce, Siracha & soya sauce, dried shrimps powder.", "price": 10.95, "emoji": "🍜" },
-      { "name": "Yaki Suba", "desc": "Thick wheat flour noodles, bean sprouts, tofu, onions, cabbage, peppers, garlic, carrots & special tangy sauce. Spring onion & sesame seeds.", "price": 10.95, "emoji": "🍜" },
-      { "name": "Yaki Udon", "desc": "Thick wheat flour noodles, bean sprouts, tofu, onions, cabbage, peppers, garlic, carrots & special tangy sauce. Spring onion & sesame seeds.", "price": 10.95, "emoji": "🍜" }
-    ]
-  },
-  "curries": {
-    "label": "Curries",
-    "img": "https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=1200&q=80",
-    "pricingTable": [
-      { "protein": "Chicken", "price": "£10.95" },
-      { "protein": "Beef",    "price": "£12.95" },
-      { "protein": "Prawn",   "price": "£12.95" },
-      { "protein": "Veg",     "price": "£9.95"  },
-      { "protein": "Tofu",    "price": "£8.95"  }
-    ],
-    "items": [
-      { "name": "Thai Green Curry", "desc": "Spicy green curry, mixed peppers, aubergine, sweet basil, lime leaves & bamboo shoots simmered in green curry paste, coconut milk & fish sauce.", "price": 10.95, "emoji": "🌿", "tags": ["hot"] },
-      { "name": "Thai Red Curry", "desc": "Spicy red curry, mixed peppers, aubergine, sweet basil, lime leaves & bamboo shoots simmered in red curry paste, coconut milk & fish sauce.", "price": 10.95, "emoji": "🌶️", "tags": ["hot"] },
-      { "name": "Panang Curry", "desc": "Medium hot curry with sweet basil, green beans, peppers, lemongrass, kaffir lime leaves in coconut milk.", "price": 10.95, "emoji": "🍛" },
-      { "name": "Massaman Curry", "desc": "Rich coconut curry with tamarind, turmeric, crispy shallots, potato & fresh basil.", "price": 10.95, "emoji": "🍛" },
-      { "name": "Rendang Curry", "desc": "Popular spicy dry & fragrant curry dish, rich & nutty with a roasted coconut lime leaf, chilli, palm sugar & fish sauce.", "price": 10.95, "emoji": "🥘", "tags": ["hot"] }
-    ]
-  },
-  "rice": {
-    "label": "Rice",
-    "img": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=1200&q=80",
-    "pricingTable": [
-      { "protein": "Chicken", "price": "£10.95" },
-      { "protein": "Beef",    "price": "£12.95" },
-      { "protein": "Prawn",   "price": "£12.95" },
-      { "protein": "Veg",     "price": "£9.95"  },
-      { "protein": "Tofu",    "price": "£8.95"  }
-    ],
-    "items": [
-      { "name": "Katsu Curry", "desc": "Panko breaded & fried crispy chicken or prawn served with a mildly spicy vegetable curry sauce with rice. Contains nuts & lactose.", "price": 10.95, "emoji": "🍛" },
-      { "name": "Nasi Goreng", "desc": "Spicy Malaysian/Indonesian fried rice with chilli paste, carrots, onions, coriander, sesame oil, crispy shallots with a fried egg on top.", "price": 10.95, "emoji": "🍳", "tags": ["hot"] },
-      { "name": "Pad Krapow", "desc": "Very Hot. Thai comfort food. Spicy stir fried minced chicken, beef, prawn or tofu with Thai basil, chillies, onions, fine beans & mix papers. Served with rice and crispy fried egg on top.", "price": 10.95, "emoji": "🌿", "tags": ["hot"] },
-      { "name": "The Himmaparn", "desc": "Wok tossed stir fry of golden cashew nuts, red onions and mix papers, in house charred aromatic sauce.", "price": 10.95, "emoji": "🥜" },
-      { "name": "Pineapple Fried Rice", "desc": "Medium spice fried rice cooked with pineapple, chopped mix papers, onions, and shrimp paste, crispy shallots with a fried egg on the side.", "price": 10.95, "emoji": "🍍" },
-      { "name": "Nam Prik Pao", "desc": "Homemade Thai chilli paste of roasted chillies and tamarind, smoky rice and sweet with Thai basil and long beans.", "price": 10.95, "emoji": "🌶️", "tags": ["hot"] }
-    ]
-  },
-  "sides": {
-    "label": "Side Dishes",
-    "img": "https://images.unsplash.com/photo-1541518763669-27fef04b14ea?w=1200&q=80",
-    "items": [
-      { "name": "Chips", "desc": "Classic crispy chips.", "price": 2.50, "emoji": "🍟", "tags": ["veg"] },
-      { "name": "Spicy Chilli Chips", "desc": "Chips tossed in sweet and spicy sauce.", "price": 3.95, "emoji": "🍟", "tags": ["hot"] },
-      { "name": "Cheesy Chips", "desc": "Fries with mozzarella cheese on top.", "price": 3.95, "emoji": "🧀" },
-      { "name": "Togarashi Sweet Potato Fries", "desc": "Served with spicy mayo sauce.", "price": 3.95, "emoji": "🍠", "tags": ["hot"] },
-      { "name": "Plain Rice", "desc": "Steamed plain white rice.", "price": 2.50, "emoji": "🍚", "tags": ["veg"] },
-      { "name": "Jasmin Fried Rice", "desc": "Aromatic jasmine fried rice. Vegan.", "price": 2.95, "emoji": "🍚", "tags": ["veg"] },
-      { "name": "Egg Fried Rice", "desc": "Stir fried with eggs & spring onions.", "price": 3.95, "emoji": "🍳" },
-      { "name": "Garlic Rice", "desc": "Stir fried rice with garlic & coriander.", "price": 3.95, "emoji": "🧄", "tags": ["veg"] },
-      { "name": "Lemon Rice", "desc": "Stir fried rice with lemon & garlic.", "price": 3.95, "emoji": "🍋", "tags": ["veg"] },
-      { "name": "Stir Fried Water Spinach", "desc": "Spicy water spinach with garlic, shallots, shrimp paste, chillies & fish sauce. Vegan version available.", "price": 4.95, "emoji": "🥬", "tags": ["hot"] },
-      { "name": "Stir Fried Broccoli", "desc": "Stir fried broccoli with onions, garlic, oyster sauce, soya sauce & spring onion.", "price": 4.95, "emoji": "🥦", "tags": ["veg"] },
-      { "name": "Stir Fried Mix Vegetable", "desc": "Seasonal mix vegetable fries with onions, garlic, oyster sauce, soya sauce & spring onion.", "price": 4.50, "emoji": "🥗", "tags": ["veg"] },
-      { "name": "Katsu Curry Sauce", "desc": "Good for vegetarian. Mildly spicy vegetable curry sauce.", "price": 3.95, "emoji": "🍛", "tags": ["veg"] }
-    ]
-  },
-  "specials": {
-    "label": "Flavours Specials",
-    "img": "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=1200&q=80",
-    "items": [
-      { "name": "Crispy Chilli Chicken", "desc": "Crispy stir fry chicken seasoned with mix papers, chilli sauce and onions.", "price": 10.95, "emoji": "🌶️", "tags": ["hot", "new"] },
-      { "name": "Szechuan Beef", "desc": "Stir fry spicy chilli, mix papers, garlic, leeks and basil with beef. Sweet spicy and complicated taste.", "price": 12.95, "emoji": "🥩", "tags": ["hot"] },
-      { "name": "Crispy Salt & Pepper Chicken", "desc": "Seasoned chicken, fried up with crunchy onions and spicy chillies.", "price": 10.95, "emoji": "🍗", "tags": ["hot"] },
-      { "name": "Chilli Prawns", "desc": "Golden crispy prawns with salt and pepper seasoning.", "price": 12.95, "emoji": "🦐", "tags": ["hot"] },
-      { "name": "Flavours Special Fried Rice", "desc": "Signature fried rice with beef, prawn, calamari, mix papers, and spring onion. Served with chilli oil and coriander.", "price": 13.95, "emoji": "🍳", "tags": ["new"] }
-    ]
-  },
-  "desserts": {
-    "label": "Desserts",
-    "img": "https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=1200&q=80",
-    "items": [
-      { "name": "Banana Fritters (Vegan)", "desc": "Four coated deep-fried bananas served with syrup & a scoop of vegan coconut sorbet.", "price": 5.95, "emoji": "🍌", "tags": ["veg"] },
-      { "name": "Black Sesame Ice Cream", "desc": "Nutty, toasted sesame Japanese style handcrafted ice cream made London.", "price": 5.95, "emoji": "🍦" },
-      { "name": "Honeycomb Ice Cream", "desc": "Delicious, creamy, caramel. Japanese style handcrafted ice cream made London.", "price": 5.95, "emoji": "🍯" },
-      { "name": "Green Tea Ice Cream", "desc": "Classic Japanese favourite, strong matcha green tea flavoured ice cream.", "price": 5.95, "emoji": "🍵" },
-      { "name": "Ice Cream Mochi (6)", "desc": "Chocolate/coconut/mango.", "price": 5.95, "emoji": "🍡" },
-      { "name": "Ben & Jerry's (465ml)", "desc": "Chocolate Fudge Brownie or Cookie Dough.", "price": 5.95, "emoji": "🍨" }
-    ]
-  },
-  "drinks": {
-    "label": "Drinks",
-    "img": "https://images.unsplash.com/photo-1544145945-f90425340c7e?w=1200&q=80",
-    "items": [
-      { "name": "Still Water",                          "price": 1.95 },
-      { "name": "Sparkling Water",                      "price": 2.50 },
-      { "name": "Coke / Diet Coke",                     "price": 1.95 },
-      { "name": "Sprite",                               "price": 1.95 },
-      { "name": "Fanta",                                "price": 1.95 },
-      { "name": "7 UP",                                 "price": 1.95 },
-      { "name": "Rubicon Mango",                        "price": 1.95 },
-      { "name": "Dr Pepper",                            "price": 1.95 },
-      { "name": "J20 Apple & Mango / Orange & Passion", "price": 2.95 },
-      { "name": "Pepsi / Diet Pepsi",                   "price": 1.95 },
-      { "name": "Capri Sun",                            "price": 1.95 },
-      { "name": "Red Bull",                             "price": 2.95 }
-    ]
-  },
-  "kids": {
-    "label": "Kids' Menu",
-    "img": "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=1200&q=80",
-    "items": [
-      { "name": "Fish Fingers & Chips",      "desc": "Crispy fish fingers served with chips.",        "price": 5.95, "emoji": "🐟" },
-      { "name": "Chicken Nuggets & Chips",   "desc": "Crispy chicken nuggets served with chips.",     "price": 5.95, "emoji": "🍗" },
-      { "name": "Bao Buns & Chips",          "desc": "Soft bao buns served with chips.",              "price": 5.95, "emoji": "🥙" },
-      { "name": "Plain Noodles with Chicken","desc": "Plain noodles served with chicken.",            "price": 5.95, "emoji": "🍜" },
-      { "name": "Plain Noodles with Veg",    "desc": "Plain noodles served with vegetables.",         "price": 5.95, "emoji": "🍜", "tags": ["veg"] }
-    ]
-  }
-};
+/* True when the user's system asks for reduced motion. */
+const prefersReducedMotion = window.matchMedia
+    && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-/* ── UTILITY: escape HTML attribute values ── */
+const DEMO_SUFFIX = " This is a demo – nothing has been sent to the restaurant.";
 
-function escapeAttr(str) {
-    return str
+/* ── UTILITY: escape text for safe insertion into HTML ── */
+
+function escapeHtml(str) {
+    return String(str)
         .replace(/&/g, "&amp;")
         .replace(/"/g, "&quot;")
         .replace(/</g, "&lt;")
@@ -239,6 +69,54 @@ function getProteinPrice(cat, protein) {
     return parsePrice(entry.price);
 }
 
+/* ── FORM ERRORS: shared inline-error helpers ──
+   Each invalid field gets aria-invalid="true" and an error message
+   linked with aria-describedby, so screen readers read the error
+   when the field receives focus. */
+
+function getErrorElement(input) {
+    const id = input.id + "-error";
+    let el = document.getElementById(id);
+    if (!el) {
+        el = document.createElement("p");
+        el.id = id;
+        el.className = "field-error";
+        el.hidden = true;
+        const anchor = input.closest("label") || input;
+        anchor.insertAdjacentElement("afterend", el);
+    }
+    return el;
+}
+
+function setFieldError(input, message) {
+    if (!input) { return; }
+    const el = getErrorElement(input);
+    if (message) {
+        el.textContent = message;
+        el.hidden = false;
+        input.setAttribute("aria-invalid", "true");
+        input.setAttribute("aria-describedby", el.id);
+    } else {
+        el.textContent = "";
+        el.hidden = true;
+        input.removeAttribute("aria-invalid");
+        input.removeAttribute("aria-describedby");
+    }
+}
+
+/* Apply an errors object to a set of fields.
+   fieldMap: { errorKey: inputElement }
+   Returns the first invalid input (for focusing), or null. */
+function applyFieldErrors(fieldMap, errors) {
+    let firstInvalid = null;
+    Object.keys(fieldMap).forEach(function (key) {
+        const input = fieldMap[key];
+        setFieldError(input, errors[key] || "");
+        if (errors[key] && !firstInvalid) { firstInvalid = input; }
+    });
+    return firstInvalid;
+}
+
 /* ── CART: add or increment an item ── */
 
 function addToCart(name, price) {
@@ -257,47 +135,81 @@ function addToCart(name, price) {
 /* ── CART: remove item by index ── */
 
 function removeFromCart(idx) {
-    cart.splice(idx, 1);
+    const removed = cart.splice(idx, 1)[0];
     renderCart();
+    if (removed) { showToast("Removed: " + removed.name); }
 }
 
-/* ── CART: re-render the cart panel ── */
+function getOrderType() {
+    const sel = document.getElementById("orderType");
+    return sel && sel.value === "collection" ? "collection" : "delivery";
+}
+
+/* ── CART: current totals using the advertised rules ── */
+
+function getOrderTotals() {
+    return calculateOrderTotals(cart, getOrderType());
+}
+
+/* ── CART: re-render the cart panel and price breakdown ── */
 
 function renderCart() {
     const el = document.getElementById("cartItems");
-    const totalEl = document.getElementById("cartTotal");
-    if (!el || !totalEl) { return; }
+    if (!el) { return; }
 
     if (cart.length === 0) {
         el.innerHTML = "<p class=\"cart-empty\">Your cart is empty. Browse the menu above!</p>";
-        totalEl.textContent = "£0.00";
-        return;
+    } else {
+        el.innerHTML = cart.map(function (item, i) {
+            const lineTotal = formatPounds(Math.round(item.price * 100) * item.qty);
+            const removeLabel = "Remove " + escapeHtml(item.name) + " from cart";
+            return "<div class=\"cart-item\">"
+                + "<span>" + item.qty + "× " + escapeHtml(item.name) + "</span>"
+                + "<span class=\"cart-item-controls\">"
+                + "<strong>" + lineTotal + "</strong>"
+                + "<button type=\"button\" class=\"cart-item-remove\" data-idx=\"" + i + "\""
+                + " aria-label=\"" + removeLabel + "\">✕</button>"
+                + "</span></div>";
+        }).join("");
     }
 
-    el.innerHTML = cart.map(function (item, i) {
-        const lineTotal = "£" + (item.price * item.qty).toFixed(2);
-        const removeLabel = "Remove " + escapeAttr(item.name) + " from cart";
-        return "<div class=\"cart-item\">"
-            + "<span>" + item.qty + "× " + escapeAttr(item.name) + "</span>"
-            + "<span class=\"cart-item-controls\">"
-            + "<strong>" + lineTotal + "</strong>"
-            + "<button class=\"cart-item-remove\" data-idx=\"" + i + "\""
-            + " aria-label=\"" + removeLabel + "\">✕</button>"
-            + "</span></div>";
-    }).join("");
-
-    const total = cart.reduce(function (sum, item) {
-        return sum + item.price * item.qty;
-    }, 0);
-    totalEl.textContent = "£" + total.toFixed(2);
+    renderTotals();
 }
 
-/* ── CART: return numeric total ── */
+function renderTotals() {
+    const totals = getOrderTotals();
+    const isCollection = getOrderType() === "collection";
 
-function getCartTotal() {
-    return cart.reduce(function (sum, item) {
-        return sum + item.price * item.qty;
-    }, 0);
+    const subtotalEl = document.getElementById("cartSubtotal");
+    const discountRow = document.getElementById("discountRow");
+    const discountEl = document.getElementById("cartDiscount");
+    const deliveryRow = document.getElementById("deliveryRow");
+    const deliveryEl = document.getElementById("cartDelivery");
+    const totalEl = document.getElementById("cartTotal");
+    const notesEl = document.getElementById("cartNotes");
+
+    if (subtotalEl) { subtotalEl.textContent = formatPounds(totals.subtotal); }
+
+    if (discountRow && discountEl) {
+        discountRow.hidden = totals.discount === 0;
+        discountEl.textContent = formatPounds(-totals.discount);
+    }
+
+    if (deliveryRow && deliveryEl) {
+        deliveryRow.hidden = isCollection;
+        if (totals.subtotal === 0) {
+            deliveryEl.textContent = "—";
+        } else if (!totals.canCheckout) {
+            deliveryEl.textContent = "Not available";
+        } else {
+            deliveryEl.textContent = totals.deliveryCharge === 0
+                ? "Free"
+                : formatPounds(totals.deliveryCharge);
+        }
+    }
+
+    if (totalEl) { totalEl.textContent = formatPounds(totals.total); }
+    if (notesEl) { notesEl.textContent = totals.notes.join(" "); }
 }
 
 /* ── CART: delegated event handler for remove buttons ── */
@@ -316,37 +228,27 @@ function initCartEvents() {
     });
 }
 
-/* ── TOAST NOTIFICATION ── */
+/* ── TOAST NOTIFICATION (styles in css/style.css → .toast) ── */
 
 function showToast(msg) {
     let toast = document.getElementById("toast");
     if (!toast) {
         toast = document.createElement("div");
         toast.id = "toast";
+        toast.className = "toast";
         toast.setAttribute("role", "status");
         toast.setAttribute("aria-live", "polite");
-        toast.style.cssText = [
-            "position:fixed;bottom:90px;right:28px;z-index:9999;",
-            "background:linear-gradient(135deg,#E8400C,#FF6B35);",
-            "color:#fff;padding:12px 22px;border-radius:50px;",
-            "font-weight:600;font-size:0.88rem;",
-            "box-shadow:0 8px 24px rgba(232,64,12,0.4);",
-            "transition:opacity 0.3s ease;pointer-events:none;"
-        ].join("");
         document.body.appendChild(toast);
     }
     toast.textContent = msg;
-    toast.style.opacity = "1";
-    clearTimeout(toast._timer);
-    toast._timer = setTimeout(function () {
-        toast.style.opacity = "0";
+    toast.classList.add("visible");
+    clearTimeout(toast.hideTimer);
+    toast.hideTimer = setTimeout(function () {
+        toast.classList.remove("visible");
     }, 2500);
 }
 
-/* ── MENU: show loading skeleton while fetch is in progress ──
-   This visible loading state proves the app handles the timing
-   gap between initiating a fetch and receiving a response,
-   satisfying the Distinction requirement for asynchronicity. */
+/* ── MENU: show loading skeleton while fetch is in progress ── */
 
 function showMenuLoading(container) {
     const skeletonCards = Array.from({ length: 6 }, function () {
@@ -360,10 +262,7 @@ function showMenuLoading(container) {
         + "</div>";
 }
 
-/* ── MENU: show user-facing error with retry button ──
-   If the fetch fails (network error, bad status), the UI clearly
-   reports the failure and offers a Retry action rather than
-   silently failing or showing a blank panel. */
+/* ── MENU: show user-facing error with retry button ── */
 
 function showMenuError(container, err) {
     const errorMsg = err && err.message ? err.message : "Unknown error";
@@ -371,8 +270,8 @@ function showMenuError(container, err) {
         + "<p class=\"menu-error-heading\">"
         + "⚠️ Sorry, the menu could not be loaded.</p>"
         + "<p class=\"menu-error-body\">Please check your connection and try again.</p>"
-        + "<button class=\"btn-primary\" id=\"retryMenuBtn\">↺ Retry</button>"
-        + "<p class=\"menu-error-detail\">Technical detail: " + escapeAttr(errorMsg) + "</p>"
+        + "<button type=\"button\" class=\"btn-primary\" id=\"retryMenuBtn\">↺ Retry</button>"
+        + "<p class=\"menu-error-detail\">Technical detail: " + escapeHtml(errorMsg) + "</p>"
         + "</div>";
 
     const retryBtn = document.getElementById("retryMenuBtn");
@@ -393,84 +292,60 @@ function buildTagHtml(tags) {
     }).join(" ");
 }
 
-/* ── MENU: render a single fixed-price menu card ── */
+/* ── MENU: render a dish card ──
+   Accessibility fix (tutor feedback): cards used to be role="button"
+   with a real <button> inside — nested interactive controls, which
+   screen readers and keyboard users cannot operate reliably.
+   Now the card is a plain <article> and the "+ Add" <button> is the
+   ONLY control. CSS (.add-to-cart::after) stretches the button's
+   click area over the whole card, so mouse users can still click
+   anywhere on the card. */
 
-function renderMenuCard(item) {
+function renderDishCard(item, options) {
     const tags = buildTagHtml(item.tags);
-    const desc = item.desc
-        ? "<p>" + item.desc + "</p>"
-        : "";
-    const priceStr = "£" + item.price.toFixed(2);
-    const nameSafe = escapeAttr(item.name);
+    const desc = item.desc ? "<p>" + escapeHtml(item.desc) + "</p>" : "";
+    const nameSafe = escapeHtml(item.name);
     const emoji = item.emoji || "🍽";
+    const priceStr = formatPounds(Math.round(options.price * 100));
 
-    return "<div class=\"menu-card tilt-card\""
-        + " role=\"button\""
-        + " tabindex=\"0\""
-        + " data-name=\"" + nameSafe + "\""
-        + " data-price=\"" + item.price + "\""
-        + " aria-label=\"Add " + nameSafe + " to cart for " + priceStr + "\">"
-        + "<div class=\"card-emoji\">" + emoji + "</div>"
+    let dataAttrs = " data-name=\"" + nameSafe + "\"";
+    let priceAttr = "";
+    let label;
+
+    if (options.cat) {
+        dataAttrs += " data-protein-item=\"true\" data-cat=\"" + options.cat + "\"";
+        priceAttr = " data-protein-price=\"" + options.cat + "\"";
+        label = "Add " + nameSafe + " (" + escapeHtml(options.protein) + ") to cart, " + priceStr;
+    } else {
+        dataAttrs += " data-price=\"" + item.price + "\"";
+        label = "Add " + nameSafe + " to cart, " + priceStr;
+    }
+
+    return "<article class=\"menu-card tilt-card\">"
+        + "<div class=\"card-emoji\" aria-hidden=\"true\">" + emoji + "</div>"
         + "<div class=\"card-body\">"
-        + "<h4>" + item.name + " " + tags + "</h4>"
+        + "<h3>" + nameSafe + " " + tags + "</h3>"
         + desc
         + "<div class=\"card-footer\">"
-        + "<span class=\"card-price\">" + priceStr + "</span>"
-        + "<button class=\"add-to-cart\""
-        + " aria-label=\"Add " + nameSafe + " to cart\">+ Add</button>"
-        + "</div></div></div>";
+        + "<span class=\"card-price\"" + priceAttr + ">" + priceStr + "</span>"
+        + "<button type=\"button\" class=\"add-to-cart\"" + dataAttrs
+        + " aria-label=\"" + label + "\">+ Add</button>"
+        + "</div></div></article>";
 }
 
-/* ── MENU: render a protein-priced menu card ──
-   The card carries data-protein-item, data-cat, and data-name.
-   At add-time the delegated handler reads the current protein
-   select value and looks up the price from fetchedMenuData —
-   the price is always live, not baked in at render time. */
-
-function renderProteinCard(item, cat, defaultProtein, defaultPrice) {
-    const tags = buildTagHtml(item.tags);
-    const desc = item.desc
-        ? "<p>" + item.desc + "</p>"
-        : "";
-    const priceStr = "£" + defaultPrice.toFixed(2);
-    const nameSafe = escapeAttr(item.name);
-    const emoji = item.emoji || "🍽";
-    const ariaLabel = "Add " + nameSafe + " (" + defaultProtein + ") to cart for " + priceStr;
-
-    return "<div class=\"menu-card tilt-card\""
-        + " role=\"button\""
-        + " tabindex=\"0\""
-        + " data-protein-item=\"true\""
-        + " data-cat=\"" + cat + "\""
-        + " data-name=\"" + nameSafe + "\""
-        + " aria-label=\"" + escapeAttr(ariaLabel) + "\">"
-        + "<div class=\"card-emoji\">" + emoji + "</div>"
-        + "<div class=\"card-body\">"
-        + "<h4>" + item.name + " " + tags + "</h4>"
-        + desc
-        + "<div class=\"card-footer\">"
-        + "<span class=\"card-price\" data-protein-price=\"" + cat + "\">"
-        + priceStr + "</span>"
-        + "<button class=\"add-to-cart\""
-        + " aria-label=\"Add " + nameSafe + " to cart\">+ Add</button>"
-        + "</div></div></div>";
-}
-
-/* ── MENU: render a drink item row ── */
+/* ── MENU: render a drink item (a single native button) ── */
 
 function renderDrinkItem(item) {
-    const nameSafe = escapeAttr(item.name);
-    const priceStr = "£" + item.price.toFixed(2);
+    const nameSafe = escapeHtml(item.name);
+    const priceStr = formatPounds(Math.round(item.price * 100));
 
-    return "<div class=\"drink-item\""
-        + " role=\"button\""
-        + " tabindex=\"0\""
+    return "<button type=\"button\" class=\"drink-item\""
         + " data-name=\"" + nameSafe + "\""
         + " data-price=\"" + item.price + "\""
-        + " aria-label=\"Add " + nameSafe + " to cart for " + priceStr + "\">"
-        + "<span>🥤 " + item.name + "</span>"
+        + " aria-label=\"Add " + nameSafe + " to cart, " + priceStr + "\">"
+        + "<span>🥤 " + nameSafe + "</span>"
         + "<span class=\"drink-price\">" + priceStr + "</span>"
-        + "</div>";
+        + "</button>";
 }
 
 /* ── MENU: render the protein selector dropdown ── */
@@ -478,14 +353,12 @@ function renderDrinkItem(item) {
 function renderProteinSelector(cat, pricingTable) {
     const options = pricingTable.map(function (row, i) {
         const selected = i === 0 ? " selected" : "";
-        return "<option value=\"" + escapeAttr(row.protein) + "\""
+        return "<option value=\"" + escapeHtml(row.protein) + "\""
             + selected + ">"
-            + row.protein + " — " + row.price + "</option>";
+            + escapeHtml(row.protein) + " — " + escapeHtml(row.price) + "</option>";
     }).join("");
 
-    return "<div class=\"protein-selector\""
-        + " role=\"group\""
-        + " aria-label=\"Choose a protein for this category\">"
+    return "<div class=\"protein-selector\">"
         + "<label for=\"protein-" + cat + "\">"
         + "🍽 Choose your protein</label>"
         + "<select id=\"protein-" + cat + "\""
@@ -497,18 +370,16 @@ function renderProteinSelector(cat, pricingTable) {
         + "<span class=\"protein-current-price\">"
         + "Price: <strong id=\"protein-price-" + cat + "\""
         + " aria-live=\"polite\">"
-        + pricingTable[0].price + "</strong></span>"
+        + escapeHtml(pricingTable[0].price) + "</strong></span>"
         + "</div>";
 }
 
-/* ── MENU: update all displayed prices when protein changes ──
-   Called by the delegated change handler on #menuPanels.
-   Reads from fetchedMenuData rather than a baked-in constant. */
+/* ── MENU: update all displayed prices when protein changes ── */
 
 function updateProteinPricing(cat, protein) {
     const price = getProteinPrice(cat, protein);
-    const priceStr = "£" + price.toFixed(2);
-    const catLabel = fetchedMenuData[cat]
+    const priceStr = formatPounds(Math.round(price * 100));
+    const catLabel = fetchedMenuData && fetchedMenuData[cat]
         ? fetchedMenuData[cat].label
         : cat;
 
@@ -522,80 +393,79 @@ function updateProteinPricing(cat, protein) {
     });
 
     document.querySelectorAll(
-        "#panel-" + cat + " [data-protein-item=\"true\"]"
-    ).forEach(function (card) {
-        const nameSafe = card.dataset.name || "";
-        card.setAttribute(
+        "#panel-" + cat + " .add-to-cart[data-protein-item=\"true\"]"
+    ).forEach(function (btn) {
+        btn.setAttribute(
             "aria-label",
-            "Add " + nameSafe + " (" + protein + ") to cart for " + priceStr
+            "Add " + (btn.dataset.name || "") + " (" + protein + ") to cart, " + priceStr
         );
     });
 
     showToast(catLabel + " now priced for " + protein + " — " + priceStr);
 }
 
-/* ── MENU: handle activation of a fixed-price card ── */
+/* ── MENU: handle a click on an "+ Add" button or drink button ── */
 
-function handleCardActivation(card) {
-    const isProtein = card.dataset.proteinItem === "true";
-    const name = card.dataset.name || "";
+function handleAddButton(btn) {
+    const name = btn.dataset.name || "";
 
-    if (isProtein) {
-        const cat = card.dataset.cat || "";
+    if (btn.dataset.proteinItem === "true") {
+        const cat = btn.dataset.cat || "";
         const select = document.getElementById("protein-" + cat);
         const catData = fetchedMenuData && fetchedMenuData[cat];
         const defaultProtein = catData && catData.pricingTable
             ? catData.pricingTable[0].protein
             : "";
         const protein = select ? select.value : defaultProtein;
-        const price = getProteinPrice(cat, protein);
-        addToCart(name + " (" + protein + ")", price);
+        addToCart(name + " (" + protein + ")", getProteinPrice(cat, protein));
     } else {
-        const price = parseFloat(card.dataset.price) || 0;
-        addToCart(name, price);
+        addToCart(name, parseFloat(btn.dataset.price) || 0);
     }
 }
 
-/* ── MENU: handle activation of a drink item ── */
+/* ── MENU: delegated event listeners on #menuPanels ──
+   Attached ONCE at start-up (previously re-attached on every render,
+   which would have added items twice after a successful Retry).
+   Native <button>s handle Enter and Space automatically, so no
+   custom keydown handler is needed. */
 
-function handleDrinkActivation(drinkItem) {
-    const name = drinkItem.dataset.name || "";
-    const price = parseFloat(drinkItem.dataset.price) || 0;
-    addToCart(name, price);
-}
+function initMenuEvents() {
+    const container = document.getElementById("menuPanels");
+    if (!container) { return; }
 
-/* ── MENU: attach delegated event listeners to #menuPanels ──
-   A single click handler and a single keydown handler cover every
-   interactive element inside the menu — no inline onclick or
-   onkeydown attributes appear anywhere in the generated HTML. */
-
-function initMenuEvents(container) {
-    /* Delegated click: menu cards, drink items, add-to-cart buttons */
     container.addEventListener("click", function (event) {
-        const card = event.target.closest(".menu-card");
-        const drink = event.target.closest(".drink-item");
-        if (card) { handleCardActivation(card); }
-        else if (drink) { handleDrinkActivation(drink); }
+        const btn = event.target.closest(".add-to-cart, .drink-item");
+        if (btn) { handleAddButton(btn); }
     });
 
-    /* Delegated keydown: Enter and Space activate focused cards */
-    container.addEventListener("keydown", function (event) {
-        if (event.key !== "Enter" && event.key !== " ") { return; }
-        const card = event.target.closest(".menu-card");
-        const drink = event.target.closest(".drink-item");
-        if (card || drink) {
-            event.preventDefault();
-            if (card) { handleCardActivation(card); }
-            if (drink) { handleDrinkActivation(drink); }
-        }
-    });
-
-    /* Delegated change: protein selector dropdowns */
     container.addEventListener("change", function (event) {
         const select = event.target.closest(".protein-select");
         if (!select) { return; }
-        const cat = select.dataset.cat || "";
-        updateProteinPricing(cat, select.value);
+        updateProteinPricing(select.dataset.cat || "", select.value);
+    });
+}
+
+/* ── MENU: category tabs (delegated, attached once) ── */
+
+function showMenuCategory(cat) {
+    document.querySelectorAll(".tab-btn").forEach(function (b) {
+        const isActive = b.dataset.cat === cat;
+        b.classList.toggle("active", isActive);
+        b.setAttribute("aria-pressed", isActive ? "true" : "false");
+    });
+    document.querySelectorAll(".menu-panel").forEach(function (p) {
+        p.classList.toggle("active", p.id === "panel-" + cat);
+    });
+}
+
+function initMenuTabs() {
+    const tabs = document.querySelector(".menu-tabs");
+    if (!tabs) { return; }
+
+    tabs.addEventListener("click", function (event) {
+        const btn = event.target.closest(".tab-btn");
+        if (!btn) { return; }
+        showMenuCategory(btn.dataset.cat);
     });
 }
 
@@ -607,12 +477,14 @@ function renderMenuPanels(container, data) {
     Object.keys(data).forEach(function (cat) {
         const catData = data[cat];
         const panel = document.createElement("div");
-        panel.className = "menu-panel" + (cat === "appetisers" ? " active" : "");
+        panel.className = "menu-panel";
         panel.id = "panel-" + cat;
+        panel.setAttribute("role", "region");
+        panel.setAttribute("aria-label", catData.label);
 
         let html = "<img class=\"panel-hero-img\""
-            + " src=\"" + escapeAttr(catData.img) + "\""
-            + " alt=\"" + escapeAttr(catData.label) + "\""
+            + " src=\"" + escapeHtml(catData.img) + "\""
+            + " alt=\"" + escapeHtml(catData.label) + " dishes\""
             + " loading=\"lazy\">";
 
         if (catData.pricingTable) {
@@ -628,14 +500,16 @@ function renderMenuPanels(container, data) {
             const defaultPrice = parsePrice(catData.pricingTable[0].price);
             html += "<div class=\"menu-grid\">"
                 + catData.items.map(function (item) {
-                    return renderProteinCard(
-                        item, cat, defaultProtein, defaultPrice
-                    );
+                    return renderDishCard(item, {
+                        cat: cat, protein: defaultProtein, price: defaultPrice
+                    });
                 }).join("")
                 + "</div>";
         } else {
             html += "<div class=\"menu-grid\">"
-                + catData.items.map(renderMenuCard).join("")
+                + catData.items.map(function (item) {
+                    return renderDishCard(item, { price: item.price });
+                }).join("")
                 + "</div>";
         }
 
@@ -643,37 +517,18 @@ function renderMenuPanels(container, data) {
         container.appendChild(panel);
     });
 
-    /* Tab switching — runs once after all panels are inserted */
-    document.querySelectorAll(".tab-btn").forEach(function (btn) {
-        btn.addEventListener("click", function () {
-            document.querySelectorAll(".tab-btn").forEach(function (b) {
-                b.classList.remove("active");
-            });
-            document.querySelectorAll(".menu-panel").forEach(function (p) {
-                p.classList.remove("active");
-            });
-            btn.classList.add("active");
-            const targetPanel = document.getElementById(
-                "panel-" + btn.dataset.cat
-            );
-            if (targetPanel) { targetPanel.classList.add("active"); }
-        });
-    });
-
-    initMenuEvents(container);
+    const activeTab = document.querySelector(".tab-btn.active");
+    showMenuCategory(activeTab ? activeTab.dataset.cat : "appetisers");
 }
 
 /* ── MENU: async entry point ──
-   1. Shows a skeleton loading state immediately (no blank flash).
+   1. Shows a skeleton loading state immediately.
    2. Fetches assets/data/menu.json and checks the HTTP status.
    3. On success: parses JSON, stores in fetchedMenuData, renders panels.
-   4. On failure: displays a user-visible error message with a Retry button.
-   This function demonstrates understanding of async/await, timing problems
-   when accessing shared state (fetchedMenuData), and graceful error handling
-   — all required for the Distinction "Craftsmanship" amplification. */
+   4. On a network error (e.g. file://): uses MENU_FALLBACK.
+   5. On an HTTP error: shows an error message with a Retry button. */
 
 async function buildMenu() {
-    /* Guard: prevent a second concurrent fetch (rapid Retry clicks). */
     if (isFetching) { return; }
     isFetching = true;
 
@@ -691,82 +546,131 @@ async function buildMenu() {
         }
         data = await response.json();
     } catch (fetchError) {
-        isFetching = false;
-
-        if (fetchError instanceof TypeError) {
-            /* TypeError = network-level failure (includes file:// protocol
-               restriction). Fall back to the inline data silently so the
-               menu still works when index.html is opened as a local file.
-               On a proper HTTP server this branch is never reached. */
+        if (fetchError instanceof TypeError && typeof MENU_FALLBACK !== "undefined") {
             console.warn(
                 "fetch() unavailable — using inline menu data. "
                 + "(" + fetchError.message + ")"
             );
             data = MENU_FALLBACK;
         } else {
-            /* HTTP error (404, 500, etc.): show the user-visible error panel
-               with a Retry button so the failure is transparent. */
+            isFetching = false;
             showMenuError(container, fetchError);
             return;
         }
     }
 
-    /* Store at module scope before rendering so event handlers
-       (e.g. protein select change) can read live pricing data. */
     fetchedMenuData = data;
     renderMenuPanels(container, fetchedMenuData);
     isFetching = false;
 }
 
-/* ── HERO SLIDER ── */
+/* ── HERO SLIDESHOW ──
+   Accessibility fixes (tutor feedback):
+   • Pause/Play button (WCAG 2.2.2) — also pauses the scrolling banner.
+   • Starts paused if the user's system asks for reduced motion.
+   • Auto-rotation pauses while the pointer or keyboard focus is in
+     the hero, so content never moves while someone is reading it.
+   • Hidden slides are made inert so Tab never lands on invisible links.
+   • aria-live is "off" while playing, "polite" when paused. */
 
-let currentSlide = 0;
-let slideTimer;
+const SLIDE_INTERVAL_MS = 5500;
 
 function initSlider() {
+    const hero = document.getElementById("hero");
+    const slidesWrap = document.getElementById("heroSlides");
     const slides = document.querySelectorAll(".hero-slide");
     const dotsContainer = document.getElementById("slideDots");
-    if (!slides.length || !dotsContainer) { return; }
+    const pauseBtn = document.getElementById("slidePause");
+    const marquee = document.getElementById("marquee");
+    if (!hero || !slides.length || !dotsContainer) { return; }
+
+    let current = 0;
+    let timer = null;
+    let userPaused = prefersReducedMotion;   /* set by the Pause button */
+    let hoverOrFocus = false;                /* temporary pause */
 
     slides.forEach(function (slide, i) {
         const dot = document.createElement("button");
-        dot.className = "slide-dot" + (i === 0 ? " active" : "");
-        dot.setAttribute("aria-label", "Go to slide " + (i + 1));
+        dot.type = "button";
+        dot.className = "slide-dot";
+        dot.setAttribute("aria-label", "Show slide " + (i + 1) + " of " + slides.length);
         dot.addEventListener("click", function () { goToSlide(i); });
         dotsContainer.appendChild(dot);
     });
+    const dots = dotsContainer.querySelectorAll(".slide-dot");
 
     function goToSlide(n) {
-        slides[currentSlide].classList.remove("active");
-        const dots = document.querySelectorAll(".slide-dot");
-        dots[currentSlide].classList.remove("active");
-        currentSlide = (n + slides.length) % slides.length;
-        slides[currentSlide].classList.add("active");
-        dots[currentSlide].classList.add("active");
+        current = (n + slides.length) % slides.length;
+        slides.forEach(function (slide, i) {
+            const isActive = i === current;
+            slide.classList.toggle("active", isActive);
+            slide.inert = !isActive;
+            slide.setAttribute("aria-hidden", isActive ? "false" : "true");
+        });
+        dots.forEach(function (dot, i) {
+            dot.classList.toggle("active", i === current);
+            if (i === current) {
+                dot.setAttribute("aria-current", "true");
+            } else {
+                dot.removeAttribute("aria-current");
+            }
+        });
     }
 
-    function nextSlide() { goToSlide(currentSlide + 1); }
-    function prevSlide() { goToSlide(currentSlide - 1); }
+    function stop() {
+        clearInterval(timer);
+        timer = null;
+    }
+
+    function start() {
+        stop();
+        if (!userPaused && !hoverOrFocus) {
+            timer = setInterval(function () { goToSlide(current + 1); }, SLIDE_INTERVAL_MS);
+        }
+    }
+
+    function updatePauseState() {
+        if (pauseBtn) {
+            pauseBtn.setAttribute("aria-pressed", userPaused ? "true" : "false");
+            pauseBtn.querySelector(".slide-pause-icon").textContent = userPaused ? "▶" : "❚❚";
+            pauseBtn.querySelector(".slide-pause-text").textContent = userPaused ? "Play" : "Pause";
+        }
+        if (slidesWrap) {
+            slidesWrap.setAttribute("aria-live", userPaused ? "polite" : "off");
+        }
+        if (marquee) { marquee.classList.toggle("paused", userPaused); }
+        start();
+    }
+
+    if (pauseBtn) {
+        pauseBtn.addEventListener("click", function () {
+            userPaused = !userPaused;
+            updatePauseState();
+        });
+    }
 
     const nextBtn = document.querySelector(".slide-next");
     const prevBtn = document.querySelector(".slide-prev");
-
     if (nextBtn) {
-        nextBtn.addEventListener("click", function () {
-            clearInterval(slideTimer);
-            nextSlide();
-            slideTimer = setInterval(nextSlide, 5500);
-        });
+        nextBtn.addEventListener("click", function () { goToSlide(current + 1); start(); });
     }
     if (prevBtn) {
-        prevBtn.addEventListener("click", function () {
-            clearInterval(slideTimer);
-            prevSlide();
-            slideTimer = setInterval(nextSlide, 5500);
-        });
+        prevBtn.addEventListener("click", function () { goToSlide(current - 1); start(); });
     }
 
-    slideTimer = setInterval(nextSlide, 5500);
+    /* Temporary pause while the user is pointing at or tabbing through the hero */
+    hero.addEventListener("mouseenter", function () { hoverOrFocus = true; stop(); });
+    hero.addEventListener("mouseleave", function () { hoverOrFocus = false; start(); });
+    hero.addEventListener("focusin", function () { hoverOrFocus = true; stop(); });
+    hero.addEventListener("focusout", function (event) {
+        if (!hero.contains(event.relatedTarget)) {
+            hoverOrFocus = false;
+            start();
+        }
+    });
+
+    goToSlide(0);
+    updatePauseState();
 }
 
 /* ── NAVBAR ── */
@@ -774,28 +678,36 @@ function initSlider() {
 function initNavbar() {
     const navbar = document.getElementById("navbar");
     const hamburger = document.getElementById("hamburger");
-    const navLinks = document.querySelector(".nav-links");
+    const navLinks = document.getElementById("navLinks");
+    const fab = document.getElementById("fabOrder");
+
+    function setMenuOpen(open) {
+        if (!navLinks || !hamburger) { return; }
+        navLinks.classList.toggle("open", open);
+        hamburger.setAttribute("aria-expanded", open ? "true" : "false");
+        hamburger.setAttribute("aria-label", open ? "Close navigation menu" : "Open navigation menu");
+    }
 
     window.addEventListener("scroll", function () {
-        if (navbar) {
-            navbar.classList.toggle("scrolled", window.scrollY > 60);
-        }
-        const fab = document.getElementById("fabOrder");
-        if (fab) {
-            fab.classList.toggle("visible", window.scrollY > 400);
-        }
+        if (navbar) { navbar.classList.toggle("scrolled", window.scrollY > 60); }
+        if (fab) { fab.classList.toggle("visible", window.scrollY > 400); }
     });
 
-    if (hamburger) {
+    if (hamburger && navLinks) {
         hamburger.addEventListener("click", function () {
-            if (navLinks) { navLinks.classList.toggle("open"); }
+            setMenuOpen(!navLinks.classList.contains("open"));
         });
     }
 
+    document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape" && navLinks && navLinks.classList.contains("open")) {
+            setMenuOpen(false);
+            hamburger.focus();
+        }
+    });
+
     document.querySelectorAll(".nav-links a").forEach(function (anchor) {
-        anchor.addEventListener("click", function () {
-            if (navLinks) { navLinks.classList.remove("open"); }
-        });
+        anchor.addEventListener("click", function () { setMenuOpen(false); });
     });
 }
 
@@ -803,6 +715,10 @@ function initNavbar() {
 
 function initReveal() {
     const els = document.querySelectorAll(".reveal");
+    if (!("IntersectionObserver" in window)) {
+        els.forEach(function (el) { el.classList.add("visible"); });
+        return;
+    }
     const observer = new IntersectionObserver(function (entries) {
         entries.forEach(function (entry) {
             if (entry.isIntersecting) {
@@ -814,11 +730,14 @@ function initReveal() {
     els.forEach(function (el) { observer.observe(el); });
 }
 
-/* ── 3D TILT (mouse-proximity effect on menu cards) ── */
+/* ── 3D TILT (mouse-proximity effect on menu cards) ──
+   Skipped when the user prefers reduced motion. */
 
 function initTilt() {
+    if (prefersReducedMotion) { return; }
+
     document.addEventListener("mousemove", function (event) {
-        document.querySelectorAll(".tilt-card").forEach(function (card) {
+        document.querySelectorAll(".menu-panel.active .tilt-card").forEach(function (card) {
             const rect = card.getBoundingClientRect();
             const cx = rect.left + rect.width / 2;
             const cy = rect.top + rect.height / 2;
@@ -843,10 +762,10 @@ function initTilt() {
     });
 }
 
-/* ── PARTICLES.JS ── */
+/* ── PARTICLES.JS (skipped for reduced motion) ── */
 
 function initParticles() {
-    if (typeof particlesJS === "undefined") { return; }
+    if (typeof particlesJS === "undefined" || prefersReducedMotion) { return; }
     particlesJS("particles-js", {
         particles: {
             number: { value: 60, density: { enable: true, value_area: 900 } },
@@ -878,19 +797,19 @@ function initParticles() {
     });
 }
 
-/* ── GSAP ANIMATIONS ── */
+/* ── GSAP ANIMATIONS (skipped for reduced motion) ── */
 
 function initGSAP() {
-    if (typeof gsap === "undefined") { return; }
+    if (typeof gsap === "undefined" || prefersReducedMotion) { return; }
     gsap.registerPlugin(ScrollTrigger);
 
-    gsap.from(".hero-title", {
+    gsap.from(".hero-slide.active .hero-title", {
         duration: 1.2, y: 60, opacity: 0, ease: "power3.out", delay: 0.3
     });
-    gsap.from(".slide-tag", {
+    gsap.from(".hero-slide.active .slide-tag", {
         duration: 0.8, y: 30, opacity: 0, ease: "power2.out", delay: 0.1
     });
-    gsap.from(".hero-btns", {
+    gsap.from(".hero-slide.active .hero-btns", {
         duration: 1, y: 40, opacity: 0, ease: "power2.out", delay: 0.6
     });
 
@@ -901,6 +820,7 @@ function initGSAP() {
         const target = parseInt(raw, 10);
         ScrollTrigger.create({
             trigger: el,
+            once: true,
             onEnter: function () {
                 gsap.to({ val: 0 }, {
                     val: target,
@@ -915,17 +835,31 @@ function initGSAP() {
     });
 }
 
-/* ── STRIPE PAYMENT ──
-   The key below is a Stripe test publishable key (development only).
-   For production, inject the live publishable key server-side via a
-   <meta> tag or environment variable — never commit a live secret key. */
+/* ── ORDER FORM ── */
 
-const STRIPE_TEST_PK = "pk_test_51000000000000000000000000000000000000000"
-    + "0000000000000000000000000000000000000000000000000000000000";
+function getOrderFields() {
+    return {
+        name: document.getElementById("custName"),
+        phone: document.getElementById("custPhone"),
+        email: document.getElementById("custEmail"),
+        address: document.getElementById("custAddress"),
+        postcode: document.getElementById("custPostcode"),
+        withinArea: document.getElementById("custWithinArea")
+    };
+}
 
-let stripe;
-let cardElement;
-let cardMounted = false;
+function readOrderValues() {
+    const f = getOrderFields();
+    return {
+        name: f.name ? f.name.value : "",
+        phone: f.phone ? f.phone.value : "",
+        email: f.email ? f.email.value : "",
+        orderType: getOrderType(),
+        address: f.address ? f.address.value : "",
+        postcode: f.postcode ? f.postcode.value : "",
+        withinArea: f.withinArea ? f.withinArea.checked : false
+    };
+}
 
 function showPaymentMessage(text, type) {
     const msg = document.getElementById("paymentMessage");
@@ -934,185 +868,299 @@ function showPaymentMessage(text, type) {
     msg.className = type;
 }
 
-function initStripe() {
-    const stripeBtn = document.getElementById("stripePayBtn");
-    const cashBtn = document.getElementById("cashPayBtn");
-    const confirmBtn = document.getElementById("confirmPayBtn");
-    const cardEl = document.getElementById("stripe-card-element");
-    if (!stripeBtn) { return; }
-
-    stripeBtn.addEventListener("click", function () {
-        if (cart.length === 0) {
-            showPaymentMessage(
-                "Please add items to your cart first.", "error"
-            );
-            return;
-        }
-        if (!stripe) {
-            stripe = Stripe(STRIPE_TEST_PK);
-            const elements = stripe.elements({
-                appearance: { theme: "night" }
-            });
-            cardElement = elements.create("card", {
-                style: {
-                    base: {
-                        color: "#F5F0E8",
-                        fontSize: "16px",
-                        "::placeholder": { color: "#9A9080" }
-                    }
-                }
-            });
-        }
-        if (!cardMounted) {
-            cardElement.mount("#stripe-card-element");
-            cardMounted = true;
-        }
-        if (cardEl) { cardEl.style.display = "block"; }
-        if (confirmBtn) { confirmBtn.style.display = "block"; }
-        stripeBtn.style.display = "none";
-    });
-
-    if (confirmBtn) {
-        confirmBtn.addEventListener("click", async function () {
-            if (!validateOrder()) { return; }
-            confirmBtn.disabled = true;
-            confirmBtn.textContent = "Processing…";
-            try {
-                /* A real PaymentIntent requires a server endpoint.
-                   This demo confirms the order without charging a card. */
-                const total = Math.round(getCartTotal() * 100);
-                const formatted = "£" + (total / 100).toFixed(2);
-                showPaymentMessage(
-                    "✅ Order placed! Total: " + formatted
-                    + ". We'll call you to confirm. ☎ 020 3883 9233",
-                    "success"
-                );
-                cart = [];
-                renderCart();
-                if (cardEl) { cardEl.style.display = "none"; }
-                confirmBtn.style.display = "none";
-                stripeBtn.style.display = "block";
-                stripeBtn.textContent = "💳 Pay by Card (Stripe)";
-                confirmBtn.disabled = false;
-                confirmBtn.textContent = "Confirm & Pay";
-            } catch (err) {
-                showPaymentMessage(
-                    "Payment error: " + err.message, "error"
-                );
-                confirmBtn.disabled = false;
-                confirmBtn.textContent = "Confirm & Pay";
-            }
-        });
-    }
-
-    if (cashBtn) {
-        cashBtn.addEventListener("click", function () {
-            if (cart.length === 0) {
-                showPaymentMessage(
-                    "Please add items to your cart first.", "error"
-                );
-                return;
-            }
-            if (!validateOrder()) { return; }
-            const orderType = document.getElementById("orderType");
-            const typeLabel = orderType && orderType.value === "collection"
-                ? "Collection"
-                : "Delivery";
-            const formatted = "£" + getCartTotal().toFixed(2);
-            showPaymentMessage(
-                "✅ " + typeLabel + " order received! Total: " + formatted
-                + ". We'll call you to confirm. ☎ 020 3883 9233",
-                "success"
-            );
-            cart = [];
-            renderCart();
-        });
-    }
-}
-
-/* ── ORDER FORM VALIDATION ── */
-
+/* Checks the cart AND the customer details before any (simulated)
+   payment. Returns true only when the order can be placed. */
 function validateOrder() {
-    const name = document.getElementById("custName");
-    const phone = document.getElementById("custPhone");
-    const email = document.getElementById("custEmail");
-    const orderType = document.getElementById("orderType");
-    const address = document.getElementById("custAddress");
+    const totals = getOrderTotals();
 
-    const nameVal = name ? name.value.trim() : "";
-    const phoneVal = phone ? phone.value.trim() : "";
-    const emailVal = email ? email.value.trim() : "";
-
-    if (!nameVal || !phoneVal || !emailVal) {
-        showPaymentMessage(
-            "Please fill in your name, phone and email.", "error"
-        );
+    if (cart.length === 0) {
+        showPaymentMessage("Please add items to your cart first.", "error");
+        return false;
+    }
+    if (!totals.canCheckout) {
+        showPaymentMessage(totals.notes.join(" "), "error");
         return false;
     }
 
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailPattern.test(emailVal)) {
-        showPaymentMessage(
-            "Please enter a valid email address.", "error"
-        );
+    const errors = validateOrderDetails(readOrderValues());
+    const firstInvalid = applyFieldErrors(getOrderFields(), errors);
+    if (firstInvalid) {
+        showPaymentMessage("Please correct the highlighted details.", "error");
+        firstInvalid.focus();
         return false;
     }
-
-    const isDelivery = orderType && orderType.value === "delivery";
-    const addressVal = address ? address.value.trim() : "";
-    if (isDelivery && !addressVal) {
-        showPaymentMessage(
-            "Please enter your delivery address.", "error"
-        );
-        return false;
-    }
-
     return true;
 }
 
-/* ── ORDER TYPE TOGGLE (show/hide address field) ── */
+/* Build the demo confirmation text from the calculated totals. */
+function buildOrderConfirmation(paymentLabel) {
+    const totals = getOrderTotals();
+    const isCollection = getOrderType() === "collection";
+    let breakdown = "subtotal " + formatPounds(totals.subtotal);
+    if (totals.discount > 0) {
+        breakdown += ", collection discount " + formatPounds(-totals.discount);
+    }
+    if (!isCollection) {
+        breakdown += ", delivery " + (totals.deliveryCharge === 0
+            ? "free"
+            : formatPounds(totals.deliveryCharge));
+    }
+    return "✅ DEMO " + (isCollection ? "collection" : "delivery")
+        + " order (" + paymentLabel + ") – total " + formatPounds(totals.total)
+        + " (" + breakdown + ")." + DEMO_SUFFIX
+        + " No payment has been taken. To order for real, call 020 3883 9233.";
+}
 
+function resetOrder() {
+    cart = [];
+    const form = document.getElementById("orderForm");
+    if (form) { form.reset(); }
+    applyFieldErrors(getOrderFields(), {});
+    renderCart();
+}
+
+/* Show/hide the delivery fields and re-price the cart when the
+   order type changes between delivery and collection. */
 function initOrderType() {
     const sel = document.getElementById("orderType");
-    const addrLabel = document.getElementById("addressLabel");
-    if (!sel || !addrLabel) { return; }
-    sel.addEventListener("change", function () {
-        addrLabel.style.display = sel.value === "collection"
-            ? "none"
-            : "block";
+    const deliveryFields = document.getElementById("deliveryFields");
+    if (!sel) { return; }
+
+    function update() {
+        const isCollection = sel.value === "collection";
+        if (deliveryFields) {
+            deliveryFields.hidden = isCollection;
+            if (isCollection) {
+                const f = getOrderFields();
+                [f.address, f.postcode, f.withinArea].forEach(function (input) {
+                    setFieldError(input, "");
+                });
+            }
+        }
+        renderTotals();
+    }
+
+    sel.addEventListener("change", update);
+    update();
+}
+
+/* Re-check a flagged field while the user corrects it.
+   Uses "input" (while typing) rather than "blur": clearing an error on
+   blur moved the buttons below mid-click, so the user's click on
+   "Pay" / "Send" could miss (found during the browser retest). */
+function initLiveFieldChecks(fieldMap, validateFn) {
+    Object.keys(fieldMap).forEach(function (key) {
+        const input = fieldMap[key];
+        if (!input) { return; }
+        const eventName = input.type === "checkbox" || input.tagName === "SELECT"
+            ? "change"
+            : "input";
+        input.addEventListener(eventName, function () {
+            if (input.getAttribute("aria-invalid") !== "true") { return; }
+            const errors = validateFn();
+            setFieldError(input, errors[key] || "");
+        });
     });
 }
 
-/* ── TABLE BOOKING ── */
+/* ── STRIPE (TEST MODE – SIMULATED PAYMENT) ──
+   This is a static front-end project with no server, so a real
+   PaymentIntent cannot be created and NO card is ever charged.
+   Stripe Elements is used only to demonstrate the card-entry UI.
+   The key below is a placeholder test publishable key. */
+
+const STRIPE_TEST_PK = "pk_test_51000000000000000000000000000000000000000"
+    + "0000000000000000000000000000000000000000000000000000000000";
+
+let stripe;
+let cardElement;
+let cardMounted = false;
+let cardComplete = false;
+
+function initPayments() {
+    const stripeBtn = document.getElementById("stripePayBtn");
+    const cashBtn = document.getElementById("cashPayBtn");
+    const confirmBtn = document.getElementById("confirmPayBtn");
+    const stripeWrap = document.getElementById("stripeWrap");
+    if (!stripeBtn || !cashBtn) { return; }
+
+    function hideCardForm() {
+        if (stripeWrap) { stripeWrap.hidden = true; }
+        stripeBtn.hidden = false;
+    }
+
+    stripeBtn.addEventListener("click", function () {
+        if (!validateOrder()) { return; }
+
+        if (typeof Stripe === "undefined") {
+            showPaymentMessage(
+                "The card payment demo could not load (Stripe.js unavailable). "
+                + "Please use the cash option instead.", "error"
+            );
+            return;
+        }
+        try {
+            if (!stripe) {
+                stripe = Stripe(STRIPE_TEST_PK);
+                cardElement = stripe.elements().create("card", {
+                    hidePostalCode: true,
+                    style: {
+                        base: {
+                            color: "#F5F0E8",
+                            fontSize: "16px",
+                            "::placeholder": { color: "#9A9080" }
+                        }
+                    }
+                });
+                cardElement.on("change", function (event) {
+                    cardComplete = event.complete;
+                    if (event.error) {
+                        showPaymentMessage(event.error.message, "error");
+                    } else {
+                        showPaymentMessage("", "");
+                    }
+                });
+            }
+            if (!cardMounted) {
+                cardElement.mount("#stripe-card-element");
+                cardMounted = true;
+            }
+        } catch (err) {
+            showPaymentMessage(
+                "The card payment demo could not start: " + err.message
+                + " Please use the cash option instead.", "error"
+            );
+            return;
+        }
+
+        if (stripeWrap) { stripeWrap.hidden = false; }
+        stripeBtn.hidden = true;
+        showPaymentMessage("", "");
+    });
+
+    if (confirmBtn) {
+        confirmBtn.addEventListener("click", function () {
+            if (!validateOrder()) { return; }
+            if (!cardComplete) {
+                showPaymentMessage(
+                    "Please complete the test card details (e.g. 4242 4242 4242 4242).",
+                    "error"
+                );
+                return;
+            }
+            /* Simulated: no PaymentIntent is created, nothing is charged. */
+            showPaymentMessage(buildOrderConfirmation("simulated card payment"), "success");
+            if (cardElement) { cardElement.clear(); }
+            cardComplete = false;
+            hideCardForm();
+            resetOrder();
+        });
+    }
+
+    cashBtn.addEventListener("click", function () {
+        if (!validateOrder()) { return; }
+        showPaymentMessage(buildOrderConfirmation("pay cash on "
+            + (getOrderType() === "collection" ? "collection" : "delivery")), "success");
+        hideCardForm();
+        resetOrder();
+    });
+}
+
+/* ── TABLE BOOKING ──
+   Fix (tutor feedback): the form previously showed a success message
+   even when every field was empty. It now validates every field with
+   validateBooking() (js/form-rules.js) and only confirms when all
+   checks pass:
+     • name and phone required; phone must be a valid UK number
+     • date required, not in the past, at most 90 days ahead
+     • time required, within opening hours (4:30pm – 10:30pm last table),
+       and at least 30 minutes from now for same-day bookings
+     • number of guests must be chosen */
+
+function getBookingFields() {
+    return {
+        name: document.getElementById("bName"),
+        phone: document.getElementById("bPhone"),
+        date: document.getElementById("bDate"),
+        time: document.getElementById("bTime"),
+        guests: document.getElementById("bGuests"),
+        notes: document.getElementById("bNotes")
+    };
+}
+
+function readBookingValues() {
+    const f = getBookingFields();
+    return {
+        name: f.name ? f.name.value : "",
+        phone: f.phone ? f.phone.value : "",
+        date: f.date ? f.date.value : "",
+        time: f.time ? f.time.value : "",
+        guests: f.guests ? f.guests.value : "",
+        notes: f.notes ? f.notes.value : ""
+    };
+}
+
+/* "2026-10-24", "19:30" → "Saturday 24 October 2026 at 7:30pm" */
+function formatBookingDateTime(dateStr, timeStr) {
+    const parts = dateStr.split("-").map(Number);
+    const date = new Date(parts[0], parts[1] - 1, parts[2]);
+    const dateText = date.toLocaleDateString("en-GB", {
+        weekday: "long", day: "numeric", month: "long", year: "numeric"
+    });
+    const t = timeStr.split(":").map(Number);
+    const hour12 = t[0] % 12 === 0 ? 12 : t[0] % 12;
+    const timeText = hour12 + ":" + String(t[1]).padStart(2, "0") + (t[0] < 12 ? "am" : "pm");
+    return dateText + " at " + timeText;
+}
 
 function submitBooking(event) {
     event.preventDefault();
     const msg = document.getElementById("bookingMsg");
-    const nameEl = document.getElementById("bName");
-    const dateEl = document.getElementById("bDate");
-    const timeEl = document.getElementById("bTime");
-    const guestsEl = document.getElementById("bGuests");
+    const values = readBookingValues();
+    const errors = validateBooking(values, new Date());
+    const firstInvalid = applyFieldErrors(getBookingFields(), errors);
+    const errorCount = Object.keys(errors).length;
 
-    const name = nameEl ? nameEl.value : "";
-    const date = dateEl ? dateEl.value : "";
-    const time = timeEl ? timeEl.value : "";
-    const guests = guestsEl ? guestsEl.value : "";
+    if (firstInvalid) {
+        if (msg) {
+            msg.innerHTML = "<p class=\"booking-error\">Your booking has not been sent. Please correct "
+                + errorCount + (errorCount === 1 ? " field" : " fields") + " above.</p>";
+        }
+        firstInvalid.focus();
+        return;
+    }
 
+    const guestsText = values.guests === "1" ? "1 guest" : values.guests + " guests";
     if (msg) {
         msg.innerHTML = "<div class=\"booking-success\">"
-            + "✅ Booking request received for " + escapeAttr(name) + "!<br>"
-            + guests + " guests · " + date + " at " + time + "<br>"
-            + "We'll call you on "
-            + "<a href=\"tel:02038839233\" class=\"booking-phone\">"
-            + "020 3883 9233</a> to confirm.</div>";
+            + "✅ DEMO booking request for " + escapeHtml(values.name.trim()) + ": "
+            + guestsText + ", " + escapeHtml(formatBookingDateTime(values.date, values.time)) + ".<br>"
+            + "<strong>This is a simulation – no table has been reserved and nothing has been sent to the restaurant.</strong><br>"
+            + "To book for real, call "
+            + "<a href=\"tel:02038839233\" class=\"booking-phone\">020 3883 9233</a>."
+            + "</div>";
     }
     event.target.reset();
+    applyFieldErrors(getBookingFields(), {});
 }
 
 function initBookingForm() {
     const form = document.getElementById("bookingForm");
     if (!form) { return; }
     form.addEventListener("submit", submitBooking);
+    initLiveFieldChecks(getBookingFields(), function () {
+        return validateBooking(readBookingValues(), new Date());
+    });
+
+    /* Limit the date picker to today … today + 90 days (local time). */
+    const dateInput = document.getElementById("bDate");
+    if (dateInput) {
+        const today = new Date();
+        const last = new Date(today);
+        last.setDate(last.getDate() + BOOKING_RULES.MAX_DAYS_AHEAD);
+        dateInput.min = toLocalDateString(today);
+        dateInput.max = toLocalDateString(last);
+    }
 }
 
 /* ── PAGE LOADER ── */
@@ -1122,30 +1170,25 @@ function initLoader() {
         setTimeout(function () {
             const loader = document.getElementById("loader");
             if (loader) { loader.classList.add("hidden"); }
-        }, 1600);
+        }, prefersReducedMotion ? 0 : 1600);
     });
 }
 
-/* ── SCROLL-TO-TOP BUTTON ── */
+/* ── SCROLL-TO-TOP BUTTON (styles in css/style.css → .scroll-top) ── */
 
 function initScrollTop() {
     const btn = document.createElement("button");
-    btn.innerHTML = "↑";
+    btn.type = "button";
+    btn.className = "scroll-top";
+    btn.textContent = "↑";
     btn.setAttribute("aria-label", "Back to top");
-    btn.style.cssText = [
-        "position:fixed;bottom:28px;left:28px;z-index:500;",
-        "background:var(--surface);border:1px solid #333;",
-        "color:var(--text);width:44px;height:44px;border-radius:50%;",
-        "font-size:1.2rem;cursor:pointer;opacity:0;transition:opacity 0.3s;",
-        "display:flex;align-items:center;justify-content:center;"
-    ].join("");
     document.body.appendChild(btn);
 
     window.addEventListener("scroll", function () {
-        btn.style.opacity = window.scrollY > 600 ? "1" : "0";
+        btn.classList.toggle("visible", window.scrollY > 600);
     });
     btn.addEventListener("click", function () {
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        window.scrollTo({ top: 0, behavior: prefersReducedMotion ? "auto" : "smooth" });
     });
 }
 
@@ -1155,24 +1198,22 @@ document.addEventListener("DOMContentLoaded", function () {
     initLoader();
     initNavbar();
 
-    /* buildMenu is async: the skeleton loads instantly while fetch runs.
-       The rest of the page initialises in parallel — no blocking wait. */
-    buildMenu();
+    initMenuTabs();
+    initMenuEvents();
+    buildMenu();   /* async: skeleton shows while fetch runs */
 
     initSlider();
     initReveal();
     initTilt();
     initParticles();
     initGSAP();
-    initStripe();
     initOrderType();
+    initPayments();
     initCartEvents();
+    initLiveFieldChecks(getOrderFields(), function () {
+        return validateOrderDetails(readOrderValues());
+    });
     initBookingForm();
     initScrollTop();
     renderCart();
-
-    const dateInput = document.getElementById("bDate");
-    if (dateInput) {
-        dateInput.min = new Date().toISOString().split("T")[0];
-    }
 });
