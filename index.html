@@ -19,6 +19,8 @@
 </head>
 <body>
 
+<a href="#main" class="skip-link">Skip to main content</a>
+
 <!-- ── PAGE LOADER ── -->
 <div id="loader" aria-hidden="true">
   <div class="loader-inner">
@@ -27,36 +29,48 @@
   </div>
 </div>
 
-<!-- ── PRIMARY NAVIGATION ── -->
+<!-- ── SITE HEADER: demo notice + primary navigation ── -->
+<header id="siteHeader" class="site-header">
+<p class="demo-banner" id="demoNotice">
+  <strong>Student demo site:</strong> ordering, card payment and table booking are
+  <strong>simulated</strong>. No order is sent, no card is charged and no table is reserved.
+  To order for real, call <a href="tel:02038839233">020 3883 9233</a>.
+</p>
 <nav id="navbar" aria-label="Primary navigation">
   <a href="#" class="nav-brand">
     <span class="brand-icon" aria-hidden="true">🔥</span>
     <span>FLAVOURS</span>
     <small>PAN ASIAN FOOD</small>
   </a>
-  <ul class="nav-links">
+  <ul class="nav-links" id="navLinks">
     <li><a href="#menu">Menu</a></li>
     <li><a href="#order">Order</a></li>
     <li><a href="#about">About</a></li>
     <li><a href="#contact">Contact</a></li>
     <li><a href="#order" class="nav-cta">Order Now</a></li>
   </ul>
-  <button class="hamburger" id="hamburger" aria-label="Toggle navigation menu" aria-expanded="false">
+  <button type="button" class="hamburger" id="hamburger" aria-label="Open navigation menu" aria-expanded="false" aria-controls="navLinks">
     <span aria-hidden="true"></span>
     <span aria-hidden="true"></span>
     <span aria-hidden="true"></span>
   </button>
 </nav>
+</header>
+
+<main id="main">
 
 <!-- ── HERO SLIDER ── -->
-<section id="hero" aria-label="Hero banner">
+<section id="hero" aria-roledescription="carousel" aria-labelledby="hero-heading">
+  <h1 id="hero-heading" class="visually-hidden">Flavours Pan Asian Food – Thai and Pan Asian restaurant, London E16</h1>
   <div id="particles-js" aria-hidden="true"></div>
-  <div class="hero-slides" aria-live="polite" aria-atomic="true">
-    <div class="hero-slide active" style="background-image:url('https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=1600&q=80')">
+  <!-- aria-live is "off" while the slideshow auto-plays and "polite" when
+       paused, so screen readers are not interrupted every 5.5 seconds -->
+  <div class="hero-slides" id="heroSlides" aria-live="off">
+    <div class="hero-slide hero-slide-1 active" role="group" aria-roledescription="slide" aria-label="1 of 4">
       <div class="slide-overlay" aria-hidden="true"></div>
       <div class="slide-content">
         <span class="slide-tag">Authentic Thai &amp; Pan Asian</span>
-        <h1 class="hero-title">Where Every<br><em>Flavour</em> Tells<br>a Story</h1>
+        <h2 class="hero-title">Where Every<br><em>Flavour</em> Tells<br>a Story</h2>
         <p>Handcrafted dishes from across Asia, delivered to your door.</p>
         <div class="hero-btns">
           <a href="#menu" class="btn-primary">Explore Menu</a>
@@ -64,11 +78,11 @@
         </div>
       </div>
     </div>
-    <div class="hero-slide" style="background-image:url('https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=1600&q=80')">
+    <div class="hero-slide hero-slide-2" role="group" aria-roledescription="slide" aria-label="2 of 4">
       <div class="slide-overlay" aria-hidden="true"></div>
       <div class="slide-content">
         <span class="slide-tag">Signature Curries</span>
-        <h1 class="hero-title">Bold Spices,<br><em>Rich</em> Aromas,<br>Pure Comfort</h1>
+        <h2 class="hero-title">Bold Spices,<br><em>Rich</em> Aromas,<br>Pure Comfort</h2>
         <p>Thai Green, Red, Panang &amp; Massaman — made from scratch daily.</p>
         <div class="hero-btns">
           <a href="#menu" class="btn-primary">View Curries</a>
@@ -76,11 +90,11 @@
         </div>
       </div>
     </div>
-    <div class="hero-slide" style="background-image:url('https://images.unsplash.com/photo-1563245372-f21724e3856d?w=1600&q=80')">
+    <div class="hero-slide hero-slide-3" role="group" aria-roledescription="slide" aria-label="3 of 4">
       <div class="slide-overlay" aria-hidden="true"></div>
       <div class="slide-content">
         <span class="slide-tag">Free Delivery</span>
-        <h1 class="hero-title">London's Finest<br><em>Pan Asian</em><br>Delivered Free</h1>
+        <h2 class="hero-title">London's Finest<br><em>Pan Asian</em><br>Delivered Free</h2>
         <p>Free delivery within 3 miles. Min order £20. Open every day 4:30PM–11PM.</p>
         <div class="hero-btns">
           <a href="#order" class="btn-primary">Order Free Delivery</a>
@@ -88,11 +102,11 @@
         </div>
       </div>
     </div>
-    <div class="hero-slide" style="background-image:url('https://images.unsplash.com/photo-1552566626-52f8b828add9?w=1600&q=80')">
+    <div class="hero-slide hero-slide-4" role="group" aria-roledescription="slide" aria-label="4 of 4">
       <div class="slide-overlay" aria-hidden="true"></div>
       <div class="slide-content">
         <span class="slide-tag">Halal Certified</span>
-        <h1 class="hero-title">Taste the<br><em>Magic</em> of<br>Pan Asia</h1>
+        <h2 class="hero-title">Taste the<br><em>Magic</em> of<br>Pan Asia</h2>
         <p>100% Halal. Fresh ingredients. Unforgettable flavours.</p>
         <div class="hero-btns">
           <a href="#menu" class="btn-primary">See Full Menu</a>
@@ -101,10 +115,18 @@
       </div>
     </div>
   </div>
-  <div class="hero-controls" role="group" aria-label="Slide controls">
-    <button class="slide-prev" aria-label="Previous slide">&#8592;</button>
-    <div class="slide-dots" id="slideDots" role="tablist" aria-label="Slide indicators"></div>
-    <button class="slide-next" aria-label="Next slide">&#8594;</button>
+  <div class="hero-controls" role="group" aria-label="Slideshow controls">
+    <!-- Pause control (WCAG 2.2.2 Pause, Stop, Hide): stops the auto-advancing
+         slideshow and the scrolling dish banner. Starts paused when the user's
+         system asks for reduced motion. -->
+    <button type="button" class="slide-pause" id="slidePause" aria-pressed="false">
+      <span class="slide-pause-icon" aria-hidden="true">❚❚</span>
+      <span class="slide-pause-text">Pause</span>
+      <span class="visually-hidden"> slideshow and scrolling banner</span>
+    </button>
+    <button type="button" class="slide-prev" aria-label="Previous slide">&#8592;</button>
+    <div class="slide-dots" id="slideDots" role="group" aria-label="Choose a slide"></div>
+    <button type="button" class="slide-next" aria-label="Next slide">&#8594;</button>
   </div>
   <div class="hero-badges" role="group" aria-label="Key information">
     <div class="badge">
@@ -127,7 +149,7 @@
 </section>
 
 <!-- ── MARQUEE ── -->
-<div class="marquee-wrapper" aria-hidden="true">
+<div class="marquee-wrapper" id="marquee" aria-hidden="true">
   <div class="marquee-track">
     <span>🍜 Pad Thai &nbsp;•&nbsp;</span><span>🍛 Thai Green Curry &nbsp;•&nbsp;</span><span>🦐 Prawn Crackers &nbsp;•&nbsp;</span><span>🌶 Crispy Chilli Chicken &nbsp;•&nbsp;</span><span>🥟 Dim Sum &nbsp;•&nbsp;</span><span>🍦 Honeycomb Ice Cream &nbsp;•&nbsp;</span><span>🥗 Som Tom &nbsp;•&nbsp;</span><span>🍱 Nasi Goreng &nbsp;•&nbsp;</span><span>🔥 Szechuan Beef &nbsp;•&nbsp;</span><span>🍜 Pad Thai &nbsp;•&nbsp;</span><span>🍛 Thai Green Curry &nbsp;•&nbsp;</span><span>🦐 Prawn Crackers &nbsp;•&nbsp;</span><span>🌶 Crispy Chilli Chicken &nbsp;•&nbsp;</span><span>🥟 Dim Sum &nbsp;•&nbsp;</span><span>🍦 Honeycomb Ice Cream &nbsp;•&nbsp;</span>
   </div>
@@ -172,17 +194,17 @@
 
     <!-- Category Tabs -->
     <nav class="menu-tabs reveal" aria-label="Menu categories">
-      <button class="tab-btn active" data-cat="appetisers">Appetisers</button>
-      <button class="tab-btn" data-cat="soup">Soup</button>
-      <button class="tab-btn" data-cat="salad">Salad</button>
-      <button class="tab-btn" data-cat="noodles">Noodles</button>
-      <button class="tab-btn" data-cat="curries">Curries</button>
-      <button class="tab-btn" data-cat="rice">Rice</button>
-      <button class="tab-btn" data-cat="sides">Side Dishes</button>
-      <button class="tab-btn" data-cat="specials">Specials</button>
-      <button class="tab-btn" data-cat="desserts">Desserts</button>
-      <button class="tab-btn" data-cat="drinks">Drinks</button>
-      <button class="tab-btn" data-cat="kids">Kids Menu</button>
+      <button type="button" class="tab-btn active" data-cat="appetisers" aria-pressed="true" aria-controls="menuPanels">Appetisers</button>
+      <button type="button" class="tab-btn" data-cat="soup" aria-pressed="false" aria-controls="menuPanels">Soup</button>
+      <button type="button" class="tab-btn" data-cat="salad" aria-pressed="false" aria-controls="menuPanels">Salad</button>
+      <button type="button" class="tab-btn" data-cat="noodles" aria-pressed="false" aria-controls="menuPanels">Noodles</button>
+      <button type="button" class="tab-btn" data-cat="curries" aria-pressed="false" aria-controls="menuPanels">Curries</button>
+      <button type="button" class="tab-btn" data-cat="rice" aria-pressed="false" aria-controls="menuPanels">Rice</button>
+      <button type="button" class="tab-btn" data-cat="sides" aria-pressed="false" aria-controls="menuPanels">Side Dishes</button>
+      <button type="button" class="tab-btn" data-cat="specials" aria-pressed="false" aria-controls="menuPanels">Specials</button>
+      <button type="button" class="tab-btn" data-cat="desserts" aria-pressed="false" aria-controls="menuPanels">Desserts</button>
+      <button type="button" class="tab-btn" data-cat="drinks" aria-pressed="false" aria-controls="menuPanels">Drinks</button>
+      <button type="button" class="tab-btn" data-cat="kids" aria-pressed="false" aria-controls="menuPanels">Kids Menu</button>
     </nav>
 
     <!-- Menu Panels — populated asynchronously by script.js -->
@@ -200,47 +222,81 @@
     <div class="order-grid">
       <div class="order-form-card reveal">
         <h3>Your Order</h3>
+        <p class="demo-note" id="orderDemoNote">
+          <strong>Demo only:</strong> this order form is a simulation for a college project.
+          Orders are not sent to the restaurant and cards are never charged.
+        </p>
+
+        <label for="orderType">Order Type
+          <select id="orderType" aria-describedby="cartNotes">
+            <option value="delivery">Delivery – free on £20+</option>
+            <option value="collection">Collection – 10% off over £20</option>
+          </select>
+        </label>
+
         <div id="cartItems" class="cart-items">
           <p class="cart-empty">Your cart is empty. Browse the menu above!</p>
         </div>
+
+        <!-- Price breakdown: subtotal, collection discount, delivery charge -->
+        <dl class="cart-summary" id="cartSummary">
+          <div class="cart-row"><dt>Subtotal</dt><dd id="cartSubtotal">£0.00</dd></div>
+          <div class="cart-row cart-row-discount" id="discountRow" hidden>
+            <dt>Collection discount (10%)</dt><dd id="cartDiscount">-£0.00</dd>
+          </div>
+          <div class="cart-row" id="deliveryRow">
+            <dt>Delivery</dt><dd id="cartDelivery">—</dd>
+          </div>
+        </dl>
         <div class="cart-total">
           <span>Total:</span>
-          <strong id="cartTotal">£0.00</strong>
+          <strong id="cartTotal" aria-live="polite">£0.00</strong>
         </div>
+        <p class="cart-notes" id="cartNotes" aria-live="polite"></p>
 
-        <div class="order-details">
+        <form class="order-details" id="orderForm" novalidate aria-label="Your details">
           <label for="custName">Full Name
-            <input type="text" id="custName" placeholder="Jane Smith" autocomplete="name">
+            <input type="text" id="custName" name="name" placeholder="Jane Smith" autocomplete="name" required>
           </label>
           <label for="custPhone">Phone
-            <input type="tel" id="custPhone" placeholder="07700 000000" autocomplete="tel">
+            <input type="tel" id="custPhone" name="phone" placeholder="07700 900123" autocomplete="tel" required>
           </label>
           <label for="custEmail">Email
-            <input type="email" id="custEmail" placeholder="you@email.com" autocomplete="email">
+            <input type="email" id="custEmail" name="email" placeholder="you@email.com" autocomplete="email" required>
           </label>
-          <label for="orderType">Order Type
-            <select id="orderType">
-              <option value="delivery">Delivery (Free within 3 miles)</option>
-              <option value="collection">Collection (10% off over £20)</option>
-            </select>
-          </label>
-          <label for="custAddress" id="addressLabel">Delivery Address
-            <input type="text" id="custAddress" placeholder="9 Pier Road, London E16…" autocomplete="address-line1">
-          </label>
+          <fieldset class="delivery-fields" id="deliveryFields">
+            <legend>Delivery details</legend>
+            <label for="custAddress">Delivery Address
+              <input type="text" id="custAddress" name="address" placeholder="12 Example Street" autocomplete="address-line1">
+            </label>
+            <label for="custPostcode">Postcode
+              <input type="text" id="custPostcode" name="postcode" placeholder="E16 2JJ" autocomplete="postal-code">
+            </label>
+            <label for="custWithinArea" class="checkbox-label">
+              <input type="checkbox" id="custWithinArea" name="withinArea">
+              My address is within 3 miles of the restaurant (9 Pier Road, E16 2JJ)
+            </label>
+          </fieldset>
           <label for="custNotes">Special Instructions
-            <textarea id="custNotes" placeholder="Allergies, spice level, etc."></textarea>
+            <textarea id="custNotes" name="notes" placeholder="Allergies, spice level, etc."></textarea>
           </label>
-        </div>
+        </form>
 
         <div class="payment-options">
-          <button class="btn-primary full-w" id="stripePayBtn">💳 Pay by Card (Stripe)</button>
-          <button class="btn-ghost full-w" id="cashPayBtn">💵 Pay Cash on Collection/Delivery</button>
+          <button type="button" class="btn-primary full-w" id="stripePayBtn">💳 Pay by Card (simulated)</button>
+          <button type="button" class="btn-ghost full-w" id="cashPayBtn">💵 Pay Cash on Collection/Delivery (simulated)</button>
         </div>
-        <div id="paymentMessage" role="alert" aria-live="polite"></div>
-        <div id="stripe-card-element" class="stripe-card" style="display:none;"></div>
-        <button id="confirmPayBtn" class="btn-primary full-w" style="display:none;margin-top:12px;">
-          Confirm &amp; Pay
-        </button>
+        <div id="paymentMessage" role="status" aria-live="polite"></div>
+        <div class="stripe-wrap" id="stripeWrap" hidden>
+          <p class="demo-note">
+            Stripe <strong>test mode</strong>: no real payment is taken. Do not enter real card
+            details – use the test card <strong>4242 4242 4242 4242</strong>, any future expiry date and any CVC.
+          </p>
+          <div id="stripe-card-element" class="stripe-card"></div>
+          <button type="button" id="confirmPayBtn" class="btn-primary full-w confirm-pay-btn">
+            Confirm Demo Order
+          </button>
+        </div>
       </div>
 
       <div class="order-info reveal delay-1">
@@ -250,7 +306,7 @@
         </div>
         <div class="info-card">
           <h4>🚚 Delivery Info</h4>
-          <p>Free delivery within 3 miles<br>Min order <strong>£20</strong><br>£2 charge below £20 (min spend £10)</p>
+          <p>Free delivery within 3 miles on orders of <strong>£20</strong> or more<br>£2 charge on orders below £20<br>Minimum spend £10 for delivery</p>
         </div>
         <div class="info-card">
           <h4>📍 Collection</h4>
@@ -276,8 +332,8 @@
       <div class="map-wrapper reveal">
         <!-- width and height set via CSS (.map-wrapper iframe) — no HTML attributes -->
         <iframe
+          class="map-frame"
           src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2483.1!2d0.0202!3d51.5030!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x487602a46d72b8c1%3A0x0!2s9+Pier+Rd%2C+London+E16+2JJ!5e0!3m2!1sen!2suk!4v1700000000000"
-          style="border:0;border-radius:16px;"
           allowfullscreen=""
           loading="lazy"
           referrerpolicy="no-referrer-when-downgrade"
@@ -291,15 +347,13 @@
         </div>
         <div class="contact-item">
           <span class="c-icon" aria-hidden="true">📞</span>
-          <div><strong>Phone</strong><a href="tel:02038839233"><p>020 3883 9233</p></a></div>
+          <div><strong>Phone</strong><p><a href="tel:02038839233">020 3883 9233</a></p></div>
         </div>
         <div class="contact-item">
           <span class="c-icon" aria-hidden="true">✉️</span>
           <div>
             <strong>Email</strong>
-            <a href="mailto:info@flavoursofpanasia.co.uk">
-              <p>info@flavoursofpanasia.co.uk</p>
-            </a>
+            <p><a href="mailto:info@flavoursofpanasia.co.uk">info@flavoursofpanasia.co.uk</a></p>
           </div>
         </div>
         <div class="contact-item">
@@ -340,40 +394,63 @@
       <h2 id="booking-heading">Book a <em>Table</em></h2>
       <p>Reserve your spot at Flavours Pan Asian Food.</p>
     </div>
-    <!-- onsubmit removed — event listener attached in script.js (initBookingForm) -->
-    <form class="booking-form reveal" id="bookingForm" novalidate>
+    <p class="demo-note booking-demo-note reveal">
+      <strong>Demo only:</strong> booking requests are simulated and are <strong>not</strong>
+      sent to the restaurant. To reserve a real table, call
+      <a href="tel:02038839233">020 3883 9233</a>.
+    </p>
+    <!-- novalidate: the browser's own pop-ups are replaced by inline error
+         messages from validateBooking() in js/form-rules.js -->
+    <form class="booking-form reveal" id="bookingForm" novalidate aria-describedby="bookingHelp">
+      <p class="form-help" id="bookingHelp">All fields except Special Requests are required.
+        Bookings are taken 4:30pm–10:30pm, up to 90 days ahead.</p>
       <div class="form-row">
-        <label for="bName">Full Name
-          <input type="text" id="bName" placeholder="Your name" required autocomplete="name">
-        </label>
-        <label for="bPhone">Phone
-          <input type="tel" id="bPhone" placeholder="07700 000000" required autocomplete="tel">
-        </label>
+        <div class="field">
+          <label for="bName">Full Name
+            <input type="text" id="bName" name="name" placeholder="Your name" required autocomplete="name" maxlength="60">
+          </label>
+        </div>
+        <div class="field">
+          <label for="bPhone">Phone
+            <input type="tel" id="bPhone" name="phone" placeholder="07700 900123" required autocomplete="tel">
+          </label>
+        </div>
       </div>
       <div class="form-row">
-        <label for="bDate">Date
-          <input type="date" id="bDate" required>
-        </label>
-        <label for="bTime">Time
-          <input type="time" id="bTime" min="16:30" max="22:30" required>
-        </label>
+        <div class="field">
+          <label for="bDate">Date
+            <input type="date" id="bDate" name="date" required>
+          </label>
+        </div>
+        <div class="field">
+          <label for="bTime">Time
+            <input type="time" id="bTime" name="time" min="16:30" max="22:30" required>
+          </label>
+        </div>
       </div>
       <div class="form-row">
-        <label for="bGuests">Guests
-          <select id="bGuests">
-            <option>1</option><option>2</option><option>3</option><option>4</option>
-            <option>5</option><option>6</option><option>7</option><option>8+</option>
-          </select>
-        </label>
-        <label for="bNotes">Special Requests
-          <input type="text" id="bNotes" placeholder="Allergies, celebration, etc.">
-        </label>
+        <div class="field">
+          <label for="bGuests">Guests
+            <select id="bGuests" name="guests" required>
+              <option value="">Choose…</option>
+              <option>1</option><option>2</option><option>3</option><option>4</option>
+              <option>5</option><option>6</option><option>7</option><option value="8+">8+</option>
+            </select>
+          </label>
+        </div>
+        <div class="field">
+          <label for="bNotes">Special Requests (optional)
+            <input type="text" id="bNotes" name="notes" placeholder="Allergies, celebration, etc." maxlength="200">
+          </label>
+        </div>
       </div>
-      <button type="submit" class="btn-primary full-w">Reserve Table</button>
-      <div id="bookingMsg" role="alert" aria-live="polite"></div>
+      <button type="submit" class="btn-primary full-w">Send Demo Booking Request</button>
+      <div id="bookingMsg" role="status" aria-live="polite"></div>
     </form>
   </div>
 </section>
+
+</main>
 
 <!-- ── FOOTER ── -->
 <footer>
@@ -384,6 +461,8 @@
         <small>PAN ASIAN FOOD</small>
       </div>
       <p>Authentic Pan Asian cuisine in the heart of London. Halal certified. Open daily.</p>
+      <p class="footer-demo">This website is a student project. Online ordering, payment and
+        booking are simulated – please phone the restaurant to order or book.</p>
       <div class="footer-social">
         <a href="https://www.tiktok.com/@flavourspanasia" target="_blank" rel="noopener noreferrer" aria-label="TikTok (opens in new tab)">TikTok</a>
         <a href="https://www.instagram.com/flavourspanasia" target="_blank" rel="noopener noreferrer" aria-label="Instagram (opens in new tab)">Instagram</a>
@@ -415,7 +494,7 @@
       <ul>
         <li>Allergen info: please ask staff</li>
         <li>Halal certified</li>
-        <li>Free delivery within 3 miles</li>
+        <li>Free delivery on £20+ within 3 miles</li>
         <li>10% off collection over £20</li>
       </ul>
     </div>
@@ -433,7 +512,11 @@
   🛒 Order Now
 </a>
 
-<!-- Custom script loaded at bottom of body so DOM is ready -->
+<!-- Custom scripts loaded at bottom of body so the DOM is ready.
+     Order matters: data and rule files define functions used by script.js. -->
+<script src="js/menu-fallback.js"></script>
+<script src="js/order-rules.js"></script>
+<script src="js/form-rules.js"></script>
 <script src="js/script.js"></script>
 </body>
 </html>
