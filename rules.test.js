@@ -16,12 +16,12 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 
-const { calculateOrderTotals, formatPounds } = require("../js/order-rules.js");
+const { calculateOrderTotals, formatPounds } = require("./js/order-rules.js");
 const {
     validateBooking, validateOrderDetails, isValidUkPhone, isValidUkPostcode,
     toLocalDateString
-} = require("../js/form-rules.js");
-const { MENU_FALLBACK } = require("../js/menu-fallback.js");
+} = require("./js/form-rules.js");
+const { MENU_FALLBACK } = require("./js/menu-fallback.js");
 
 /* Fixed "now" for date/time tests: Wednesday 21 Oct 2026, 2:00pm local */
 const NOW = new Date(2026, 9, 21, 14, 0);
@@ -215,7 +215,7 @@ test("invalid email and postcode are rejected", function () {
 
 test("MENU_FALLBACK matches assets/data/menu.json", function () {
     const json = JSON.parse(fs.readFileSync(
-        path.join(__dirname, "..", "assets", "data", "menu.json"), "utf8"
+        path.join(__dirname, "assets", "data", "menu.json"), "utf8"
     ));
     assert.deepEqual(MENU_FALLBACK, json);
 });

@@ -6,7 +6,7 @@ corrected behaviour. Results are recorded in README.md → Testing → Retest.
 
 Setup (once):   pip install playwright && python -m playwright install chromium
 Run:            python -m http.server 8765        (in the project folder)
-                python tests/browser_retest.py     (in a second terminal)
+                python browser_retest.py     (in a second terminal)
 
 Stripe.js is replaced by a small mock so the card-payment WIRING can be tested
 without a network connection. The real Stripe card field must still be checked
@@ -231,7 +231,9 @@ def run():
               f"aria-pressed={pressed}, slide {start}→{later}")
 
         page.click("#slidePause")
-        page.focus("#cartItems")
+        # Move focus and pointer out of the hero: the slideshow intentionally
+        # waits while keyboard focus or the mouse is inside it.
+        page.evaluate("document.activeElement.blur()")
         page.mouse.move(5, 890)
         page.wait_for_timeout(6200)
         moved = page.evaluate("[...document.querySelectorAll('.hero-slide')].findIndex(s => s.classList.contains('active'))")

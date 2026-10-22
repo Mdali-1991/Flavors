@@ -164,9 +164,8 @@ flavors/
 │   ├── form-rules.js                 ← Booking and order-form validation rules
 │   ├── script.js                     ← Page behaviour: menu, cart, forms, slideshow
 │   └── 404.js                        ← 404 countdown and redirect
-├── tests/
-│   ├── rules.test.js                 ← 31 automated unit tests (Node.js)
-│   └── browser_retest.py             ← 25 automated browser checks (Playwright)
+├── rules.test.js                     ← 31 automated unit tests (Node.js)
+├── browser_retest.py                 ← 25 automated browser checks (Playwright)
 └── assets/
     ├── data/
     │   └── menu.json                 ← Menu data (fetched at runtime via fetch API)
@@ -539,7 +538,7 @@ Tests 25–29 and the validation screenshots below were recorded **before** the 
 
 ### Retest After Fixes (October 2026)
 
-#### Automated unit tests — `tests/rules.test.js`
+#### Automated unit tests — `rules.test.js`
 
 Run with `node --test` (Node.js 18+, no packages needed). **Result: 31 / 31 passed.**
 
@@ -556,7 +555,7 @@ Run with `node --test` (Node.js 18+, no packages needed). **Result: 31 / 31 pass
 | Order details | Delivery needs address, postcode and 3-mile confirmation; collection does not; bad email/postcode rejected | Pass |
 | Data | `MENU_FALLBACK` identical to `menu.json` | Pass |
 
-#### Automated browser retest — `tests/browser_retest.py`
+#### Automated browser retest — `browser_retest.py`
 
 The real `index.html` was opened in headless Chromium (Playwright, Europe/London time zone) and each fix was exercised the way a user would. Stripe.js was replaced with a small mock for R15 because the test machine had no internet access; the real Stripe card field is checked manually (M1). **Result: 25 / 25 passed** (21 October 2026).
 
@@ -789,7 +788,7 @@ node --test
 # Browser retest (Python 3 + Playwright)
 pip install playwright && python -m playwright install chromium
 python -m http.server 8765          # terminal 1
-python tests/browser_retest.py      # terminal 2
+python browser_retest.py      # terminal 2
 ```
 
 ---
