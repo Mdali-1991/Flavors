@@ -1,0 +1,90 @@
+/* ============================================================
+   Flavours Pan Asian Food – 404.css
+   Styles for the 404 page only (moved out of an inline <style>
+   block in 404.html). Shared tokens come from css/style.css.
+   ============================================================ */
+
+/* ── 404-specific layout — overrides site-wide body defaults ── */
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 24px;
+}
+
+/* ── Error code display ── */
+.error-code {
+  font-size: clamp(6rem, 20vw, 10rem);
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  line-height: 1;
+  background: linear-gradient(135deg, var(--fire), var(--gold));
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+.error-emoji {
+  font-size: 3rem;
+  margin: 16px 0;
+}
+
+.card-404 {
+  max-width: 540px;
+  width: 100%;
+}
+
+.card-404 h1 {
+  font-size: clamp(1.4rem, 4vw, 2rem);
+  margin-bottom: 12px;
+}
+
+.card-404 > p {
+  color: var(--muted);
+  line-height: 1.7;
+  margin-bottom: 32px;
+}
+
+/* ── Countdown text ── */
+#countdown {
+  font-size: 1rem;
+  color: var(--muted);
+  margin-top: 16px;
+}
+
+/* ── Return home button ── */
+.btn-home {
+  display: inline-block;
+  background: linear-gradient(135deg, var(--fire) 0%, #FF6B35 100%);
+  color: #fff;
+  padding: 14px 36px;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 1rem;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-home:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(232, 64, 12, 0.4);
+}
+
+.btn-home:focus {
+  outline: 2px solid var(--gold);
+  outline-offset: 4px;
+}
+
+/* ── Footer note ── */
+.page-note {
+  display: block;
+  margin-top: 40px;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
