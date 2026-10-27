@@ -869,6 +869,13 @@ function showPaymentMessage(text, type) {
     msg.className = type;
 }
 
+/* Remove a red payment message once the problem it describes is fixed
+   (never removes the green order confirmation). */
+function clearPaymentError() {
+    const msg = document.getElementById("paymentMessage");
+    if (msg && msg.className === "error") { showPaymentMessage("", ""); }
+}
+
 /* Show the demo order confirmation and bring it into view.
    On a phone the message sits below the payment buttons, so it is
    scrolled into view and focused (screen readers then read it). */
@@ -960,8 +967,10 @@ function initOrderType() {
 /* Re-check a flagged field while the user corrects it.
    Uses "input" (while typing) rather than "blur": clearing an error on
    blur moved the buttons below mid-click, so the user's click on
-   "Pay" / "Send" could miss (found during the browser retest). */
-function initLiveFieldChecks(fieldMap, validateFn) {
+   "Pay" / "Send" could miss (found during the browser retest).
+   onAllFixed (optional) runs once no flagged field is left, so the red
+   summary message ("Please correct 5 fields above") disappears too. */
+function initLiveFieldChecks(fieldMap, validateFn, onAllFixed) {
     Object.keys(fieldMap).forEach(function (key) {
         const input = fieldMap[key];
         if (!input) { return; }
@@ -972,6 +981,10 @@ function initLiveFieldChecks(fieldMap, validateFn) {
             if (input.getAttribute("aria-invalid") !== "true") { return; }
             const errors = validateFn();
             setFieldError(input, errors[key] || "");
+            const stillFlagged = Object.keys(fieldMap).some(function (k) {
+                return fieldMap[k] && fieldMap[k].getAttribute("aria-invalid") === "true";
+            });
+            if (!stillFlagged && onAllFixed) { onAllFixed(); }
         });
     });
 }
@@ -1084,7 +1097,7 @@ function initPayments() {
     initCardFormatting();
     initLiveFieldChecks(getCardFields(), function () {
         return validateTestCard(readCardValues(), new Date());
-    });
+    }, clearPaymentError);
 }
 
 /* ── TABLE BOOKING ──
@@ -1171,6 +1184,9 @@ function initBookingForm() {
     form.addEventListener("submit", submitBooking);
     initLiveFieldChecks(getBookingFields(), function () {
         return validateBooking(readBookingValues(), new Date());
+    }, function () {
+        const msg = document.getElementById("bookingMsg");
+        if (msg && msg.querySelector(".booking-error")) { msg.innerHTML = ""; }
     });
 
     /* Limit the date picker to today … today + 90 days (local time). */
@@ -1235,7 +1251,7 @@ document.addEventListener("DOMContentLoaded", function () {
     initCartEvents();
     initLiveFieldChecks(getOrderFields(), function () {
         return validateOrderDetails(readOrderValues());
-    });
+    }, clearPaymentError);
     initBookingForm();
     initScrollTop();
     renderCart();
