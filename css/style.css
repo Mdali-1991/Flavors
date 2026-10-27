@@ -120,34 +120,8 @@ label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 
 .btn-ghost:focus { outline: 2px solid var(--gold); outline-offset: 3px; }
 
 /* ── LOADER ── */
-#loader {
-  position: fixed; inset: 0;
-  background: var(--dark);
-  display: flex; align-items: center; justify-content: center;
-  z-index: 9999;
-  transition: opacity 0.6s ease, visibility 0.6s;
-}
-#loader.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
-.loader-inner { text-align: center; }
-.loader-logo {
-  font-family: 'Playfair Display', serif;
-  font-size: 2.8rem;
-  font-weight: 900;
-  letter-spacing: 8px;
-  background: linear-gradient(135deg, var(--fire), var(--gold));
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 20px;
-}
-.loader-bar { width: 200px; height: 3px; background: #222; border-radius: 2px; overflow: hidden; }
-.loader-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--fire), var(--gold));
-  animation: loadFill 1.5s ease forwards;
-}
-@keyframes loadFill { from { width: 0; } to { width: 100%; } }
+/* (Full-screen page loader removed at reassessment — it hid the already-loaded
+   page for about a second; see README Bug Log #34.) */
 
 /* ── NAVBAR ── */
 /* Fixed header holds the demo notice and the navigation bar */
@@ -196,7 +170,9 @@ label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 
 }
 
 /* ── HERO ── */
-#hero { position: relative; height: 100vh; min-height: 640px; overflow: hidden; }
+/* min-height 800px: on short laptop screens (e.g. 1366×641) the headline
+   used to slide under the fixed header and the buttons ran into the badges. */
+#hero { position: relative; height: 100vh; min-height: 800px; overflow: hidden; }
 #particles-js { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
 .hero-slides { position: absolute; inset: 0; }
 .hero-slide {
@@ -209,9 +185,11 @@ label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 
   position: absolute; inset: 0;
   background: linear-gradient(135deg, rgba(0, 0, 0, 0.78) 0%, rgba(0, 0, 0, 0.3) 100%);
 }
+/* Centred in the space between the fixed header (~105px) and the badge
+   strip (~90px), not in the middle of the whole hero. */
 .slide-content {
   position: absolute;
-  left: 10%; top: 50%; transform: translateY(-50%);
+  left: 10%; top: calc(50% + 8px); transform: translateY(-50%);
   z-index: 3; max-width: 620px;
 }
 .slide-tag {
@@ -230,6 +208,16 @@ label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 
   color: #fff;
 }
 .hero-title em { font-style: italic; color: var(--gold); }
+/* Entrance animation for the first slide's tag and buttons — starts with the
+   first paint (no JavaScript needed, so no flicker). The headline itself is
+   not animated, so it can be painted straight away (Largest Contentful Paint).
+   Users who prefer reduced motion get it instantly (global rule below). */
+@keyframes heroIntro { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
+.hero-slide-1 .slide-tag { animation: heroIntro 0.6s ease-out both; }
+.hero-slide-1 .hero-btns { animation: heroIntro 0.8s ease-out 0.2s both; }
+@media (prefers-reduced-motion: reduce) {
+  .hero-slide-1 .slide-tag, .hero-slide-1 .hero-btns { animation: none; }
+}
 .slide-content > p { font-size: 1.05rem; color: rgba(255, 255, 255, 0.8); margin-bottom: 32px; max-width: 440px; }
 .hero-btns { display: flex; gap: 14px; flex-wrap: wrap; }
 .hero-controls {
@@ -260,17 +248,19 @@ label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 
 .slide-dot:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
 
 /* Hero slide backgrounds (moved here from inline style attributes) */
+/* Photos 2–4 only load once the page has finished loading (script.js adds
+   .load-all), so they do not compete with the first photo on slow connections. */
 .hero-slide-1 { background-image: url('https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?auto=format&fit=crop&w=1600&q=70'); }
-.hero-slide-2 { background-image: url('https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?auto=format&fit=crop&w=1600&q=70'); }
-.hero-slide-3 { background-image: url('https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=1600&q=70'); }
-.hero-slide-4 { background-image: url('https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=1600&q=70'); }
+.hero-slides.load-all .hero-slide-2 { background-image: url('https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?auto=format&fit=crop&w=1600&q=70'); }
+.hero-slides.load-all .hero-slide-3 { background-image: url('https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=1600&q=70'); }
+.hero-slides.load-all .hero-slide-4 { background-image: url('https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=1600&q=70'); }
 
 /* Phones get an 800px-wide version of each hero photo (about a quarter of the data) */
 @media (max-width: 800px) {
   .hero-slide-1 { background-image: url('https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?auto=format&fit=crop&w=800&q=70'); }
-  .hero-slide-2 { background-image: url('https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?auto=format&fit=crop&w=800&q=70'); }
-  .hero-slide-3 { background-image: url('https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=800&q=70'); }
-  .hero-slide-4 { background-image: url('https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=800&q=70'); }
+  .hero-slides.load-all .hero-slide-2 { background-image: url('https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?auto=format&fit=crop&w=800&q=70'); }
+  .hero-slides.load-all .hero-slide-3 { background-image: url('https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=800&q=70'); }
+  .hero-slides.load-all .hero-slide-4 { background-image: url('https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=800&q=70'); }
 }
 
 /* Pause / Play control for the slideshow and scrolling banner (WCAG 2.2.2) */
@@ -339,14 +329,23 @@ label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 
 .about-section { background: var(--surface); }
 .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
 .about-images { position: relative; }
-.about-img-main img { width: 100%; border-radius: 20px; object-fit: cover; aspect-ratio: 4/3; }
+/* height: auto + min-width: 0 — the img width/height attributes (added so
+   the browser reserves space while loading) must not stretch the grid column
+   wider than a phone screen. */
+.about-grid > * { min-width: 0; }
+.about-img-main img { width: 100%; height: auto; border-radius: 20px; object-fit: cover; aspect-ratio: 4/3; }
 .about-img-accent {
   position: absolute; bottom: -30px; right: -30px;
   width: 220px; border-radius: 14px; overflow: hidden;
   border: 4px solid var(--dark);
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
 }
-.about-img-accent img { width: 100%; aspect-ratio: 1; object-fit: cover; }
+.about-img-accent img { width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; }
+/* Two columns only when there is room for the four stat boxes */
+@media (max-width: 900px) {
+  .about-grid { grid-template-columns: 1fr; gap: 60px; }
+  .about-img-accent { width: 140px; right: -10px; bottom: -10px; }
+}
 .about-badge-float {
   position: absolute; top: -16px; left: -16px;
   background: linear-gradient(135deg, var(--fire), var(--accent));
@@ -806,8 +805,9 @@ input[aria-invalid="true"], select[aria-invalid="true"], textarea[aria-invalid="
 /* ── MOBILE HERO ──
    On narrow screens the four badges wrap onto two rows and used to cover
    the slideshow controls (including the Pause button). The badges now sit
-   below the slideshow instead of on top of it. */
-@media (max-width: 768px) {
+   below the slideshow instead of on top of it. Applies up to 900px, where
+   the badge text wraps and the strip gets taller. */
+@media (max-width: 900px) {
   #hero { height: auto; min-height: 0; }
   .hero-slides { position: relative; height: 700px; }
   .slide-content { top: calc(50% + 10px); }
