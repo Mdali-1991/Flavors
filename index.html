@@ -7,27 +7,24 @@
   <meta name="description" content="Authentic Pan Asian cuisine in London. Open 7 days a week, 4:30PM–11PM. Free delivery within 3 miles. Order online now.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- Google Fonts without blocking the first paint (Lighthouse: 780 ms saved on mobile).
+       media="print" stylesheets do not block rendering; js/fonts.js (async) switches it
+       to all screens as soon as it has loaded. <noscript> covers browsers without JavaScript. -->
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&amp;family=Inter:wght@400;500;600&amp;display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&amp;family=Inter:wght@400;500;600&amp;display=swap" media="print" id="googleFonts">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&amp;family=Inter:wght@400;500;600&amp;display=swap"></noscript>
+  <script async src="js/fonts.js"></script>
   <!-- Load the first hero photo early, at a size that suits the screen (Lighthouse LCP fix) -->
   <link rel="preload" as="image" fetchpriority="high" href="https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?auto=format&fit=crop&w=1600&q=70" imagesrcset="https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?auto=format&fit=crop&w=800&q=70 800w, https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?auto=format&fit=crop&w=1600&q=70 1600w" imagesizes="100vw">
   <link rel="stylesheet" href="css/style.css">
-  <!-- GSAP core and ScrollTrigger plugin -->
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-  <!-- Particles.js -->
-  <script defer src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+  <!-- GSAP, ScrollTrigger and Particles.js are loaded by js/script.js after the
+       page has finished loading (see loadEffects) — they are decoration, so they
+       must not compete with the first screen on slow mobile connections. -->
 </head>
 <body>
 
 <a href="#main" class="skip-link">Skip to main content</a>
 
-<!-- ── PAGE LOADER ── -->
-<div id="loader" aria-hidden="true">
-  <div class="loader-inner">
-    <div class="loader-logo">FLAVOURS</div>
-    <div class="loader-bar"><div class="loader-fill"></div></div>
-  </div>
-</div>
 
 <!-- ── SITE HEADER: demo notice + primary navigation ── -->
 <header id="siteHeader" class="site-header">

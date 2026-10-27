@@ -53,14 +53,14 @@ My tutors' assessment outcome was *Further work required before a Pass can be co
 |---|---|---|---|---|
 | 1 | **Booking validation** | `submitBooking()` showed the success message without checking anything, so an empty form was "accepted". My earlier test records for tests 13–15 were wrong. | Every field is now checked by `validateBooking()`: name required; UK phone number format; date required, not in the past, at most 90 days ahead; time within opening hours (4:30pm – 10:30pm last table) and at least 30 minutes ahead for same-day bookings; guests required. Errors appear under each field (`aria-invalid` + `aria-describedby`), focus moves to the first error, and nothing is confirmed until all checks pass. | `js/form-rules.js`, `js/script.js` (`submitBooking`) |
 | 2 | **Order pricing** | The cart total ignored the advertised rules, so a £21.90 collection order stayed £21.90. | `calculateOrderTotals()` applies **10% off collection orders over £20**, **free delivery on £20+**, a **£2 charge on delivery orders under £20**, and the **£10 delivery minimum**. The cart shows subtotal, discount, delivery charge and total, and updates when the order type changes. All maths is in whole pence. £21.90 collection now totals **£19.71**. | `js/order-rules.js`, `js/script.js` (`renderTotals`) |
-| 3 | **Testing documentation** | Tests 13–15 were recorded as Pass when the feature did not work. | Corrected the original records (now shown as Fail), fixed the code, and documented the real retest results: 37 automated unit tests and 26 automated browser checks, all passing. | [Testing](#testing) |
+| 3 | **Testing documentation** | Tests 13–15 were recorded as Pass when the feature did not work. | Corrected the original records (now shown as Fail), fixed the code, and documented the real retest results: 37 automated unit tests and 28 automated browser checks, all passing. | [Testing](#testing) |
 | 4a | **Carousel pause control** | The hero slideshow auto-advanced with no way to stop it (WCAG 2.2.2). | Added a Pause/Play button (`aria-pressed`) that also stops the scrolling dish banner. The slideshow also pauses while the pointer or keyboard focus is inside it, starts paused for users who ask for reduced motion, and hidden slides are `inert` so Tab cannot reach invisible links. | `index.html`, `js/script.js` (`initSlider`) |
 | 4b | **Nested interactive controls** | Menu cards were `role="button"` *and* contained a `<button>` (a control inside a control). | Cards are now plain `<article>` elements; the "+ Add" `<button>` is the only control. A CSS `::after` area keeps the whole card clickable for mouse users. Drinks are single native `<button>`s. The custom keydown handler is no longer needed. | `js/script.js` (`renderDishCard`, `renderDrinkItem`), `css/style.css` |
 | 4c | **Inline code** | 180 lines of menu data inside `script.js`; inline `style` attributes (hero slides, map, payment area); styles set with JavaScript `cssText`; an inline `<style>` and `<script>` in `404.html`. | Moved into external files: `js/menu-fallback.js`, `js/order-rules.js`, `js/form-rules.js`, `css/404.css`, `js/404.js`; hero backgrounds, map, toast and scroll-to-top styles are now CSS classes. No `style=` attributes, inline `<style>`/`<script>` or `on*=` attributes remain in the HTML. | all files |
 | 4d | **Image filenames** | Mixed case (`Screenshot-about.jpeg`) and a typo (`js-vaidator.jpeg`). | Renamed to lowercase: `screenshot-about.jpeg`, `screenshot-contact.jpeg`, `screenshot-halal.jpeg`, `screenshot-menu.jpeg`, `js-validator.jpeg`. | `assets/img/` |
 | 5 | **Demonstration status** | Confirmation messages could be mistaken for real orders or bookings. | A notice banner at the top of every page, notes beside the order form, card form and booking form, a footer note, and every confirmation now begins "DEMO" and says nothing was sent or charged. Buttons are labelled "simulated". | `index.html`, `js/script.js` |
 
-Other problems I found and fixed while retesting are listed in the [Bug Log](#bug-log--found-and-fixed) (bugs 11–27).
+Other problems I found and fixed while retesting are listed in the [Bug Log](#bug-log--found-and-fixed) (bugs 11–35).
 
 ---
 
@@ -159,13 +159,14 @@ Flavors/
 │   ├── style.css                     ← Site styles; CSS custom properties
 │   └── 404.css                       ← 404 page styles
 ├── js/
+│   ├── fonts.js                      ← Loads Google Fonts without blocking the first paint
 │   ├── menu-fallback.js              ← Offline copy of menu.json (file:// only)
 │   ├── order-rules.js                ← Pricing rules: discount, delivery charge, minimum
 │   ├── form-rules.js                 ← Booking and order-form validation rules
 │   ├── script.js                     ← Page behaviour: menu, cart, forms, slideshow
 │   └── 404.js                        ← 404 countdown and redirect
 ├── rules.test.js                     ← 37 automated unit tests (Node.js)
-├── browser_retest.py                 ← 26 automated browser checks (Playwright)
+├── browser_retest.py                 ← 28 automated browser checks (Playwright)
 └── assets/
     ├── data/
     │   └── menu.json                 ← Menu data (fetched at runtime via fetch API)
@@ -231,7 +232,7 @@ Menu data is stored in `assets/data/menu.json` and fetched asynchronously at run
 | HTML5 | — | Semantic structure (`<nav>`, `<main>`, `<section>`, `<footer>`, `<article>`) |
 | CSS3 | — | Custom properties, CSS Grid, Flexbox, `@keyframes`, `clamp()` for fluid typography |
 | Vanilla JavaScript | ES2020 (ES11) | `async/await`, `fetch`, `IntersectionObserver`, event delegation |
-| GSAP + ScrollTrigger | 3.12.5 | Hero entrance animation and scroll-triggered stat counter |
+| GSAP + ScrollTrigger | 3.12.5 | Scroll-triggered stat counter (loaded after page load; skipped for reduced motion) |
 | Particles.js | 2.0.0 | Ambient particle layer in the hero section |
 | Google Fonts | — | Playfair Display, Inter |
 | Netlify | — | Cloud deployment and 404 handling |
@@ -530,10 +531,10 @@ In summary: manual testing was used throughout this project for UI, accessibilit
 | 25 | W3C HTML validation | Paste index.html into validator.w3.org | No errors | 0 errors, 0 warnings | Pass |
 | 26 | W3C CSS validation | Paste style.css into jigsaw.w3.org | No errors | 0 errors | Pass |
 | 27 | JSHint | Paste js/script.js into jshint.com (esversion: 11) | No errors | 0 errors, 0 warnings | Pass |
-| 28 | Lighthouse — Accessibility | Chrome DevTools Lighthouse | Score ≥ 90 | Score 97 | Pass |
-| 29 | Lighthouse — Performance | Chrome DevTools Lighthouse | Score ≥ 80 | Score 84 | Pass |
+| 28 | Lighthouse — Accessibility | Chrome DevTools Lighthouse | Score ≥ 90 | Score 97 (reassessment, mobile: 100 — see M5) | Pass |
+| 29 | Lighthouse — Performance | Chrome DevTools Lighthouse | Score ≥ 80 | Score 84 at first submission; **66 on mobile** when re-run at reassessment → fixed (Bug Log #25), now 83 mobile / 95 desktop — see M5 | Pass (after fix) |
 
-Tests 25–29 and the validation screenshots below were recorded **before** the reassessment changes. They must be re-run on the updated files — see the manual retest checklist below.
+Tests 25–29 were first recorded for the June submission. They were re-run on the live site for reassessment on 27 October 2026 — see M4 and M5 below and the updated screenshots.
 
 ### Retest After Fixes (October 2026)
 
@@ -557,7 +558,7 @@ Run with `node --test` (Node.js 18+, no packages needed). **Result: 37 / 37 pass
 
 #### Automated browser retest — `browser_retest.py`
 
-The real `index.html` was opened in headless Chromium (Playwright, Europe/London time zone) and each fix was exercised the way a user would. **Result: 26 / 26 passed** (22 October 2026).
+The real `index.html` was opened in headless Chromium (Playwright, Europe/London time zone) and each fix was exercised the way a user would. **Result: 28 / 28 passed** (27 October 2026).
 
 | # | Test | Actual result | Result |
 |---|---|---|---|
@@ -587,21 +588,23 @@ The real `index.html` was opened in headless Chromium (Playwright, Europe/London
 | R24 | 404 page at a nested missing URL | External `404.css` loads | Pass |
 | R25 | Console | No JavaScript errors | Pass |
 | R26 | Tab through the whole page | Skip link is the first stop; all 95 page controls show a 2 px gold focus ring (the embedded Google map shows its own focus markers) | Pass |
+| R27 | Empty booking submitted, then every field corrected | The red "Your booking has not been sent…" summary disappears once the last error is fixed (previously it stayed until Send was pressed again) | Pass |
+| R28 | Layout at 10 screen sizes from 320×640 to 1920×1080, including a 1366×641 laptop | No sideways scrolling; hero text below the fixed header and above the badge strip; hero buttons clear of the slide controls | Pass |
 
 Also checked in the browser: no horizontal scrolling at 320 px, 375 px, 768 px and 1280 px wide (320 px previously scrolled sideways — Bug Log #20); slideshow controls visible on mobile (previously covered by the badges — Bug Log #18). A scan of both HTML files finds no `style=` attributes, inline `<style>`/`<script>` blocks or `on*=` attributes, and no upper-case filenames remain.
 
 #### Manual retest on the live site (https://fpafood.netlify.app)
 
-M2 and M3 were carried out with an automated keyboard walk-through and an accessibility-tree inspection in Chromium, using files identical to the deployed site. M1, M4, M5 and M6 need a real browser with internet access and are carried out by hand on the live site.
+M2 and M3 were carried out with an automated keyboard walk-through and an accessibility-tree inspection in Chromium, using files identical to the deployed site. M1, M4, M5 and M6 were carried out on the live site (https://fpafood.netlify.app) on 27 October 2026 in Google Chrome 154 on Windows, typing and clicking as a customer would.
 
 | # | Test | Expected | Actual | Result |
 |---|---|---|---|---|
-| M1 | On a phone: Pay by Card → enter `4242 4242 4242 4242`, `12/30`, `123` → Confirm Demo Order | Green "DEMO … simulated card payment" box appears; a real card number is refused | | |
+| M1 | Live site: 2 × Pad Thai (Chicken), Collection, test name/phone/email → Pay by Card → first only `424242-4242` → Confirm; then `4242 4242 4242 4242`, `12/30`, `123` → Confirm Demo Order | Errors for an incomplete card; green "DEMO … simulated card payment" box for the test card | Cart £21.90 → discount −£2.19 → **£19.71**. Incomplete card: "Card number must be 16 digits…", "Please enter an expiry date (MM/YY).", "Enter a 3-digit security code…" and "Payment not taken". Number auto-formatted to "4242 4242 4242 4242", expiry to "12/30". Confirm: "✅ DEMO collection order (simulated card payment) – total £19.71 (subtotal £21.90, collection discount -£2.19)… No payment has been taken." in a green box, scrolled into view; card form closed and cart emptied (screenshot below). Earlier, on 22 Oct, this showed nothing on a phone — Bug Log #22–23. | Pass (after fix) |
 | M2 | Keyboard only: Tab from the top of the page | Skip link appears first; Pause button reachable; visible focus on every control | Skip link first, then demo-banner phone link, navigation, visible slide's buttons, **Pause**, slide controls, menu tabs, "+ Add" buttons, order and booking forms, footer (96 stops). Hidden slides skipped. Form fields, the 3-mile checkbox and date/time pickers had only a faint border change or no indicator — fixed (Bug Log #21), now a 2 px gold ring everywhere (R26). | Pass (after fix) |
 | M3 | Accessibility tree (what screen readers receive) for a menu item and the booking errors | "+ Add" button reads dish and price; each error is read with its field | Menu item: article → heading "Pad Thai" (level 3) → button "Add Pad Thai (Chicken) to cart, £10.95". Booking: every field has its label as its name; after an empty submit each field is marked invalid with its error linked, and the status message reads "Your booking has not been sent. Please correct 5 fields above." | Pass |
-| M4 | W3C HTML validator (`index.html`, `404.html`); W3C CSS validator (`style.css`, `404.css`); JSHint (all files in `js/`) | No errors | | |
-| M5 | Lighthouse (mobile) | Accessibility ≥ 90 | | |
-| M6 | Chrome, Firefox, Safari, mobile Safari/Chrome | Booking, pricing and Pause work as in R1–R19 | | |
+| M4 | W3C HTML validator (live `https://fpafood.netlify.app/` and `/404.html`); W3C CSS validator (`style.css`, `404.css`); JSHint 2.13.6 on jshint.com (all 6 files in `js/`, `esversion: 11`) | No errors | First run found **"Stray end tag div"** (our error, Bug Log #24) and "Stray start tag script" (Netlify's injected "Powered by Netlify" badge script after `</html>`). Fixed our tag; switched the badge off in Netlify (Project configuration → General). Re-run: HTML **"No errors or warnings to show"** for both pages. CSS: **"Congratulations! No Error Found"** for both files; 24 + 4 warnings remain, all unavoidable notes (CSS variables can't be checked statically; `-webkit-` prefixes needed for gradient text and scrollbars). JSHint: style warnings fixed (Bug Log #27), now **0 warnings** in all 6 files. | Pass (after fixes) |
+| M5 | Lighthouse 13.5 via PageSpeed Insights (pagespeed.web.dev), mobile and desktop | Performance ≥ 80, Accessibility ≥ 90 | First run (mobile): Performance **66** (Largest Contentful Paint 10.7 s), Accessibility 97 (slide dots too small to tap), Best Practices 100, SEO 100. Each problem Lighthouse reported was fixed and the test re-run (Bug Log #25–26 and #31–35); in between, mobile scores of 77–83 showed the remaining causes. **Final mobile: Performance 99, Accessibility 100, Best Practices 100, SEO 100** (First Contentful Paint 1.5 s, Largest Contentful Paint 2.0 s, Total Blocking Time 0 ms, Cumulative Layout Shift 0.015, Speed Index 2.0 s). **Final desktop: 99 / 100 / 100 / 100** (FCP 0.8 s, LCP 0.8 s, TBT 0 ms, CLS 0.006, SI 1.1 s). | Pass (after fixes) |
+| M6 | Other browsers and devices: booking and ordering as a customer | Booking, pricing and payment work as in R1–R19 | **Google Chrome 154, Windows (live site):** empty booking rejected — all 5 required fields flagged, focus moved to Full Name, "Your booking has not been sent. Please correct 5 fields above."; valid booking (28 Oct 2026, 7:30pm, 2 guests) → "✅ DEMO booking request for Test Customer: 2 guests, Wednesday, 28 October 2026 at 7:30pm. This is a simulation…"; order and card payment as M1; order section back in two columns. **Chrome on Android (student's phone, 22 Oct):** collection discount £21.90 → £19.71 correct; the card step showed nothing, which led to Bug Log #22–23. **Headless Chromium 141 at 10 screen sizes from 320 to 1920 px:** R1–R28 all pass, no sideways scrolling. **Live site after the final deploy:** empty booking rejected (5 fields), red summary clears once fixed, valid booking confirmed, collection £21.90 → £19.71, real card `4111…` refused, test card confirmed. Firefox and Safari were not available for this retest. | Pass (Chrome desktop and mobile layouts) |
 
 ### Automated / Tool Checks
 
@@ -612,41 +615,57 @@ M2 and M3 were carried out with an automated keyboard walk-through and an access
 | W3C CSS Jigsaw (`jigsaw.w3.org`) | `css/style.css` | 0 errors |
 | JSHint (`jshint.com`, `esversion:11`, `unused:true`) | `js/script.js` | 0 errors |
 | ESLint 10 (`no-undef`, `no-unused-vars`, `eqeqeq`, `curly`, `semi`, `no-redeclare`) — reassessment, 22 Oct 2026 | all 5 files in `js/` | 0 errors, 0 warnings |
-| Lighthouse (Chrome DevTools) | `index.html` | Accessibility 97, Best Practices 100 |
+| Lighthouse (Chrome DevTools) — first submission | `index.html` | Accessibility 97, Best Practices 100 |
+| W3C HTML Validator — reassessment, 27 Oct 2026 | live `/` and `/404.html` | 0 errors, 0 warnings |
+| W3C CSS Validator — reassessment, 27 Oct 2026 | live `css/style.css`, `css/404.css` | 0 errors (warnings explained in M4) |
+| JSHint 2.13.6 (jshint.com) — reassessment, 27 Oct 2026 | all 6 files in `js/` | 0 warnings |
+| Lighthouse 13.5 (PageSpeed Insights) — reassessment, 27 Oct 2026 | live site | Mobile 99 / 100 / 100 / 100; Desktop 99 / 100 / 100 / 100 (Performance / Accessibility / Best Practices / SEO) |
 
 ### Validation Screenshots
 
-The screenshots below were captured from the live validation tools for the **first submission**. The files have changed since, so the validators must be re-run and these screenshots replaced (manual retest M4).
+The screenshots below were captured from the live validation tools on **27 October 2026**, after the reassessment fixes (manual retests M1, M4 and M5).
 
 #### HTML — Nu Html Checker (validator.w3.org)
 
-![Nu HTML Checker — No errors or warnings](assets/img/html-validation.jpeg)
+![Nu HTML Checker — https://fpafood.netlify.app/ — No errors or warnings](assets/img/html-validation.jpeg)
 
-*Result: "Document checking completed. No errors or warnings to show."*
+*Result for the live address https://fpafood.netlify.app/: "Document checking completed. No errors or warnings to show." (`/404.html`: the same.)*
 
 #### CSS — W3C CSS Validation Service (jigsaw.w3.org)
 
 ![W3C CSS Validator — No errors found](assets/img/css-validation.jpeg)
 
-*Result: "Congratulations! No Error Found." — validates as CSS level 3 + SVG.*
+*Result for `css/style.css`: "Congratulations! No Error Found." — validates as CSS level 3 + SVG. (`css/404.css`: the same.)*
 
-#### JavaScript — JSHint (jshint.com / Pie.Host JS Validator)
+#### JavaScript — JSHint (jshint.com)
 
-![JSHint — Valid JavaScript code](assets/img/js-validator.jpeg)
+![JSHint 2.13.6 — js/script.js — metrics only, no warnings](assets/img/js-validator.jpeg)
 
-*Result: "Valid JavaScript code!" — checked with `esversion: 11`, `browser: true`, `unused: true`.*
+*Result for `js/script.js` (1,243 lines, 126 functions): no warnings — jshint.com shows only the Metrics panel. Checked with `esversion: 11`, `browser: true`, `undef: true`, `unused: true`. The other five files in `js/` also give 0 warnings.*
+
+#### Lighthouse — PageSpeed Insights (mobile and desktop)
+
+![Lighthouse mobile: Performance 99, Accessibility 100, Best Practices 100, SEO 100](assets/img/lighthouse-mobile.jpeg)
+
+![Lighthouse desktop: Performance 99, Accessibility 100, Best Practices 100, SEO 100](assets/img/lighthouse-desktop.jpeg)
+
+*Mobile: 99 / 100 / 100 / 100. Desktop: 99 / 100 / 100 / 100 (Performance / Accessibility / Best Practices / SEO).*
+
+#### Simulated card payment on the live site (M1)
+
+![Green DEMO confirmation: simulated card payment, total £19.71](assets/img/screenshot-card-confirmation.jpeg)
 
 ---
 
 ### Finished Project Screenshots (AC 3.3)
 
-The screenshots below were captured from the live Netlify deployment for the first submission. The order, booking, menu and hero sections have changed for reassessment (price breakdown, validation errors, "+ Add" buttons, Pause button, demo notices), so those screenshots should be retaken from the redeployed site.
+The screenshots for US-1, US-5, US-6 and US-7 were retaken from the live site on 27 October 2026 after the reassessment changes; the others (menu tabs, mobile layout, keyboard focus, 404 page, contact section) are from the first submission and still match the site.
 
 #### US-1 — Hero section (new visitor landing)
 
-![Hero section — Passionate About Authentic Pan Asian Cuisine](assets/img/screenshot-hero.png)
+![Hero section — headline, buttons, Play/Pause control, slide dots and info badges](assets/img/screenshot-hero-live.jpeg)
 
-*Brand headline, "Passionate About Authentic Pan Asian Cuisine", rendered immediately on load. "See Full Menu" and "Order Pickup" CTAs visible. Carousel dot indicators show multiple hero slides. Navigation bar present with all section links.*
+*Headline "Where Every Flavour Tells a Story", "Explore Menu" and "Order Online" buttons, the slideshow controls (Pause/Play — shown as **Play** here because this computer asks for reduced motion, so the slideshow starts paused — previous/next and slide dots) and the four info badges: Open Daily, Free Delivery, Halal Certified, 10% Off collection. The yellow banner at the top says ordering, payment and booking are simulated.*
 
 #### US-2 — Menu tabs (category browsing)
 
@@ -668,21 +687,21 @@ The screenshots below were captured from the live Netlify deployment for the fir
 
 #### US-5 — Protein selector and live price update
 
-![Protein dropdown on noodle dish — price updates on selection](assets/img/screenshot-protein.png)
+![Noodles tab with Prawn selected — every dish and the price label show £12.95](assets/img/screenshot-protein-live.jpeg)
 
-*`<select>` dropdown visible on applicable noodle/rice dishes. Selecting a protein option triggers the `change` event handler (via event delegation on `#menuPanels`) and updates both the displayed price and the card's `aria-label` in real time.*
+*Choosing **Prawn — £12.95** in the protein dropdown re-prices every noodle dish to £12.95 at once. The `change` event is handled by event delegation on `#menuPanels`, which also updates each "+ Add" button's accessible name (e.g. "Add Pad Thai (Prawn) to cart, £12.95").*
 
 #### US-6 — Cart panel and payment options
 
-![Cart with items, total and payment options](assets/img/screenshot-cart.png)
+![Collection order: 2 × Pad Thai and a Still Water, subtotal £23.85, 10% discount −£2.39, total £21.46](assets/img/screenshot-cart-live.jpeg)
 
-*Itemised list of added dishes with quantities and prices, card and cash options (first submission shown). Since reassessment the cart also shows the subtotal, collection discount, delivery charge and total (see R9–R12), and the payment buttons are labelled "simulated".*
+*Collection order: 2 × Pad Thai (Chicken) £21.90 and a Still Water £1.95 → subtotal **£23.85**, collection discount (10%) **−£2.39**, total **£21.46**, with the note "10% collection discount applied." The demo notice sits above the order type, and the delivery rules are repeated in the info cards on the right.*
 
 #### US-7 — Table booking form with validation
 
-![Booking form with inline validation message on invalid submit](assets/img/screenshot-booking.png)
+![Booking form after an empty submit — every required field outlined with its own error message](assets/img/screenshot-booking-live.jpeg)
 
-*Form fields: Full Name, Phone, Date, Time, Guests, Special Requests. **Correction:** in the first submission no validation message appeared on invalid submit — the form confirmed every submission. Since reassessment, each invalid field shows its own error message underneath (see R1–R7) and the confirmation is labelled as a demo.*
+*After pressing "Send Demo Booking Request" with nothing filled in: Full Name, Phone, Date, Time and Guests are each outlined with their own message ("Please enter your name.", "Please enter a phone number so we can confirm your booking.", …), and the form is not sent. **Correction:** in the first submission no validation happened and every submission was "confirmed" (see R1–R8 and M6).*
 
 #### US-8 — Keyboard accessibility (visible focus ring)
 
@@ -735,6 +754,14 @@ The screenshots below were captured from the live Netlify deployment for the fir
 | 25 | Lighthouse mobile Performance 66: Largest Contentful Paint 10.7 s (found in M5) | Animation libraries blocked rendering; the first hero photo was found late and downloaded at 1600 px even on phones; the loader waited for every image, font and the map plus 1.6 s; an unused font (Satisfy) was downloaded | Scripts `defer`red; first hero photo preloaded with a phone-sized version; 800 px hero photos on phones and WebP/AVIF via `auto=format`; menu photos 1200 → 900 px; About photos lazy-loaded; loader hides 0.4 s after the page is ready; unused font removed | reassessment |
 | 26 | Lighthouse: slide dots too small to tap (8×8 px) (found in M5) | Dots were tiny buttons | Each dot is now a 24×24 px button with the same 8 px dot drawn inside, so the design is unchanged | reassessment |
 | 27 | JSHint: style warnings on all JavaScript files (found in M4) | Global `"use strict"` not declared as intended; `+`/`&&`/`?` at the start of continued lines | Declared `strict: global`; operators moved to line ends (formatting only) | reassessment |
+| 28 | On a short laptop screen (1366×641) the hero headline slid under the fixed header and the buttons ran into the badge strip (found while taking screenshots in M6) | The hero was sized to the window height with a 640 px minimum and the text was centred on the whole hero | Hero at least 800 px tall on desktop; text centred between the header and the badges; the stacked phone/tablet hero layout now applies up to 900 px (R28) | reassessment |
+| 29 | Phones and tablets could scroll sideways (found in M6) | Introduced during fix #25: the `width`/`height` attributes added to the About photos stretched that grid column, and the small overlapping photo sat 30 px outside its frame | `min-width: 0` and `height: auto` on the About grid and photos; single-column About section up to 900 px; overlapping photo offset reduced; checked at 90 screen sizes (R28) | reassessment |
+| 30 | Red summary message ("Please correct 5 fields above" / "Payment not taken") stayed after every field was fixed (found in M6) | Only the individual field errors were re-checked while typing | The summary is removed as soon as no field is flagged (R27) | reassessment |
+| 31 | Lighthouse mobile Performance dropped to 78 on a re-run (Speed Index 5.0 s) (found in M5) | The splash screen stayed until the animation libraries had downloaded from their CDNs; menu photos were 900 px on phones | Splash set to fade by itself (later removed entirely — #34); menu photos offered at 600, 750 and 900 px with `srcset`, so phones download a smaller file | reassessment |
+| 32 | Lighthouse mobile: blank screen for about 0.8 s before anything appeared (found in M5) | The Google Fonts stylesheet blocked the first paint ("Render-blocking requests", 780 ms) | Fonts stylesheet loaded with `media="print"` and switched on by `js/fonts.js` (async) — no inline code; `<noscript>` fallback; text appears at once in a fallback font and swaps to Playfair/Inter when ready | reassessment |
+| 33 | On slow mobile data the hero headline appeared, vanished and faded back in; Largest Contentful Paint stayed above 4 s (found in M5) | The entrance animation used `gsap.from()`, which only runs once GSAP has downloaded from its CDN — it then hid the already-visible headline and animated it back; the particle animation also started during the first paint | Entrance animation moved to CSS keyframes that start with the first paint (tag and buttons only — the headline is shown immediately); turned off for reduced-motion users; particles start after the page has fully loaded | reassessment |
+| 34 | Lighthouse mobile still 77: the hero photo downloaded in 20 ms but appeared 2.1 s later ("element render delay") (found in M5) | A full-screen "FLAVOURS" page loader covered the already-loaded page on first paint, and the slideshow started changing slides while the page was still loading | Page loader removed (it only hid content that was ready); slideshow auto-rotation starts once the page has fully loaded; photos for slides 2–4 download only after the page has loaded (or when the user changes slide), leaving the bandwidth to the first photo | reassessment |
+| 35 | Lighthouse mobile score varied between 77 and 81 between runs (found in M5) | GSAP, ScrollTrigger and Particles.js (about 120 KB from two CDNs) still downloaded during page load and competed with the first hero photo for bandwidth | The three libraries are now fetched by `loadEffects()` in `js/script.js` only after the page has fully loaded (ScrollTrigger after GSAP), and not at all for reduced-motion users | reassessment |
 
 ### Unfixed Bugs
 
@@ -825,9 +852,9 @@ Hero and about-section photographs: [Unsplash](https://unsplash.com) — free to
 
 | Source | Usage | Licence |
 |---|---|---|
-| [GSAP](https://gsap.com) by GreenSock | Hero entrance and stat counter animations | GreenSock Standard Licence (free for non-commercial) |
-| [ScrollTrigger](https://gsap.com/docs/v3/Plugins/ScrollTrigger/) | Scroll-triggered reveal animations | Bundled with GSAP |
-| [Particles.js](https://github.com/VincentGarreau/particles.js/) by Vincent Garreau | Ambient particle layer in hero | MIT Licence |
+| [GSAP](https://gsap.com) by GreenSock | About-section number counters (loaded after the page has loaded) | GreenSock Standard Licence (free for non-commercial) |
+| [ScrollTrigger](https://gsap.com/docs/v3/Plugins/ScrollTrigger/) | Starts the counters when they scroll into view | Bundled with GSAP |
+| [Particles.js](https://github.com/VincentGarreau/particles.js/) by Vincent Garreau | Ambient particle layer in hero (loaded after the page has loaded) | MIT Licence |
 | [Google Fonts](https://fonts.google.com) | Playfair Display, Inter | Open Font Licence |
 | [Google Maps Embed API](https://developers.google.com/maps/documentation/embed) | Location map | Google Maps Platform Terms |
 | MDN Web Docs | `IntersectionObserver`, `async/await`, `fetch` API reference | Reference documentation |
@@ -861,7 +888,7 @@ Several AI tools were used during development as coding assistants, in the same 
 - Performed all manual testing across six browsers and two viewport sizes
 - Wrote the deployment steps, bug log, and test case table from my own testing notes
 
-**Reassessment corrections (October 2026):** Claude (Anthropic) was also used as a coding assistant to implement the corrections requested in the tutor feedback: the booking and order validation rules, the pricing rules, the slideshow pause control, the menu-card markup changes, the demonstration notices and the automated tests, and to draft the reassessment sections of this README. I reviewed every change against the feedback before resubmitting. The list above describes my work on the first submission.
+**Reassessment corrections (October 2026):** Claude (Anthropic) was also used as a coding assistant to implement the corrections requested in the tutor feedback: the booking and order validation rules, the pricing rules, the simulated card form, the slideshow pause control, the menu-card markup changes, the demonstration notices, the accessibility, layout and performance fixes found while retesting, and the automated tests, and to draft the reassessment sections of this README and record the retest results. I reviewed every change against the feedback before resubmitting. The list above describes my work on the first submission.
 
 All AI suggestions were reviewed, tested, and modified before inclusion. I can explain every function, every CSS rule, and every design decision in this project — because they are my own.
 

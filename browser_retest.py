@@ -61,7 +61,7 @@ def run():
         page.on("pageerror", lambda e: errors.append(str(e)))
         page.goto(BASE, wait_until="load")
         page.wait_for_selector(".menu-card")
-        page.wait_for_timeout(1800)  # loader fades out
+        page.wait_for_timeout(500)
 
         # ── BOOKING ──
         page.click("#bookingForm button[type=submit]")
@@ -109,6 +109,17 @@ def run():
         page.dispatch_event("#bGuests", "change")
         check("R7", "Error clears once the field is corrected",
               page.get_attribute("#bGuests", "aria-invalid") is None)
+
+        # Summary message disappears once every flagged field has been fixed
+        page.evaluate("document.getElementById('bookingForm').reset()")
+        page.click("#bookingForm button[type=submit]")        # empty → 5 errors + summary
+        had_summary = "has not been sent" in page.inner_text("#bookingMsg")
+        fill_booking(page)
+        page.dispatch_event("#bGuests", "change")
+        check("R27", "Red summary message clears once all booking fields are corrected",
+              had_summary and page.inner_text("#bookingMsg").strip() == ""
+              and page.locator("#bookingForm [aria-invalid=true]").count() == 0,
+              repr(page.inner_text("#bookingMsg")))
 
         fill_booking(page)
         page.click("#bookingForm button[type=submit]")
@@ -282,6 +293,27 @@ def run():
                 weak.append(r[1])
         check("R26", "Keyboard: skip link first; every control shows a 2px focus ring",
               first == "skip-link" and not weak, f"{stops} tab stops, without ring: {weak or 'none'}")
+
+        # Layout at many screen sizes: no sideways scrolling, hero text clear of
+        # the fixed header and the badge strip, buttons clear of slide controls
+        layout_bad = []
+        for w, h in [(320, 640), (390, 844), (768, 1024), (800, 600), (850, 900), (900, 700),
+                     (1024, 700), (1366, 641), (1440, 900), (1920, 1080)]:
+            lp = ctx.new_page()
+            lp.set_viewport_size({"width": w, "height": h})
+            lp.goto(BASE, wait_until="load")
+            lp.wait_for_selector(".menu-card")
+            r = lp.evaluate("""(() => { const R = s => document.querySelector(s).getBoundingClientRect();
+                const hd = R('#siteHeader'), c = R('.hero-slide.active .slide-content'), ctl = R('.hero-controls'), bd = R('.hero-badges');
+                const btns = [...document.querySelectorAll('.hero-slide.active .hero-btns a')].map(a => a.getBoundingClientRect());
+                const ov = (a, b) => a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
+                return { sideScroll: document.documentElement.scrollWidth > innerWidth, underHeader: c.top < hd.bottom,
+                         intoBadges: c.bottom > bd.top, buttonsHitControls: btns.some(x => ov(x, ctl)) }; })()""")
+            if any(r.values()):
+                layout_bad.append(f"{w}x{h}: " + ", ".join(k for k, v in r.items() if v))
+            lp.close()
+        check("R28", "Layout at 10 screen sizes (320–1920 px): no sideways scroll, hero clear of header/badges",
+              not layout_bad, "; ".join(layout_bad) or "all clear")
 
         check("R25", "No JavaScript errors during the run", not errors, "; ".join(errors))
         browser.close()
