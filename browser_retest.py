@@ -8,46 +8,26 @@ Setup (once):   pip install playwright && python -m playwright install chromium
 Run:            python -m http.server 8765        (in the project folder)
                 python browser_retest.py     (in a second terminal)
 
-Stripe.js is replaced by a small mock so the card-payment WIRING can be tested
-without a network connection. The real Stripe card field must still be checked
-by hand (see README, manual retest).
+External CDNs (fonts, images, animation libraries) are blocked during the run;
+the site is designed to work without them.
 """
 
 import datetime as dt
 import sys
+from zoneinfo import ZoneInfo
 
 from playwright.sync_api import sync_playwright
 
 BASE = "http://localhost:8765/"
 RESULTS = []
 
-STRIPE_MOCK = """
-window.Stripe = function () {
-  return { elements: function () { return { create: function () {
-    var handlers = {};
-    var el = {
-      on: function (name, fn) { handlers[name] = fn; },
-      mount: function (sel) {
-        var box = document.querySelector(sel);
-        box.innerHTML = '<input id="mockCard" aria-label="Mock card number">';
-        box.querySelector('input').addEventListener('input', function (e) {
-          handlers.change && handlers.change({ complete: e.target.value === '4242424242424242' });
-        });
-      },
-      clear: function () {}
-    };
-    return el;
-  } }; } };
-};
-"""
-
-
 def check(test_id, name, condition, detail=""):
     RESULTS.append((test_id, name, bool(condition), detail))
 
 
 def london_today():
-    return dt.datetime.now(dt.timezone(dt.timedelta(hours=1))).date()
+    # Real Europe/London time zone, so BST/GMT changes are handled
+    return dt.datetime.now(ZoneInfo("Europe/London")).date()
 
 
 def fill_booking(page, name="Jane Smith", phone="07700 900123", date=None,
@@ -74,7 +54,6 @@ def run():
     with sync_playwright() as p:
         browser = p.chromium.launch()
         ctx = browser.new_context(timezone_id="Europe/London", viewport={"width": 1280, "height": 900})
-        ctx.add_init_script(STRIPE_MOCK)
         # External CDNs are not needed for these checks
         ctx.route("**/*", lambda r: r.abort() if "localhost" not in r.request.url else r.continue_())
         page = ctx.new_page()
@@ -191,14 +170,32 @@ def run():
         page.fill("#custName", "Jane Smith")
         page.fill("#custPhone", "07700 900123")
         page.fill("#custEmail", "jane@example.com")
-        page.click("#stripePayBtn")
+        # Card form: the user's case (partial number, no expiry/CVC) must show errors
+        page.set_viewport_size({"width": 390, "height": 760})   # phone-sized
+        page.click("#cardPayBtn")
+        form_open = page.is_visible("#cardForm") and page.evaluate("document.activeElement.id") == "cardNumber"
+        page.fill("#cardNumber", "424242-4242")
         page.click("#confirmPayBtn")
-        blocked = "complete the test card" in page.inner_text("#paymentMessage")
-        page.fill("#mockCard", "4242424242424242")
+        partial_flagged = page.locator("#cardForm [aria-invalid=true]").count()
+        page.fill("#cardNumber", "4111 1111 1111 1111")
+        page.fill("#cardExpiry", "12/30")
+        page.fill("#cardCvc", "123")
         page.click("#confirmPayBtn")
+        real_card_msg = page.inner_text("#cardNumber-error") if page.is_visible("#cardNumber-error") else ""
+        page.fill("#cardNumber", "")
+        page.type("#cardNumber", "4242424242424242")
+        formatted = page.input_value("#cardNumber")
+        page.click("#confirmPayBtn")
+        page.wait_for_timeout(700)
         pm = page.inner_text("#paymentMessage")
-        check("R15", "Card (mock Stripe) needs complete card; confirmation says simulated",
-              blocked and "simulated card payment" in pm and "£19.71" in pm, pm)
+        in_view = page.evaluate("""(() => { const r = document.getElementById('paymentMessage').getBoundingClientRect();
+            return r.top >= 0 && r.bottom <= window.innerHeight; })()""")
+        check("R15", "Simulated card: errors for incomplete or real cards; test card confirms, message in view on a phone",
+              form_open and partial_flagged == 3 and "real cards are not accepted" in real_card_msg
+              and formatted == "4242 4242 4242 4242" and "simulated card payment" in pm and "£19.71" in pm
+              and in_view and page.is_hidden("#cardForm"),
+              f"partial number → {partial_flagged} fields flagged; 4111… → {real_card_msg!r}; then: {pm}")
+        page.set_viewport_size({"width": 1280, "height": 900})
 
         # ── ACCESSIBILITY & CODE ORGANISATION ──
         nested = page.evaluate("""document.querySelectorAll(
@@ -265,6 +262,26 @@ def run():
         p404.goto(BASE + "no/such/page.html")
         status_ok = p404.evaluate("getComputedStyle(document.querySelector('.btn-home')).borderRadius") == "50px"
         check("R24", "404 page styles load from external CSS on a nested URL", status_ok)
+
+        kb = ctx.new_page()
+        kb.goto(BASE, wait_until="load")
+        kb.wait_for_selector(".menu-card")
+        kb.wait_for_timeout(1500)
+        first, stops, weak = None, 0, []
+        for _ in range(250):
+            kb.keyboard.press("Tab")
+            kb.wait_for_timeout(400)  # focus rings fade in over 0.35 s
+            r = kb.evaluate("""(() => { const e = document.activeElement; const cs = getComputedStyle(e);
+                return [e.tagName, e.id || String(e.className).split(' ')[0], cs.outlineStyle, parseFloat(cs.outlineWidth)]; })()""")
+            if r[0] == "BODY":
+                break
+            stops += 1
+            first = first or r[1]
+            # The Google Maps iframe moves focus into Google's own page, which shows its own focus marker
+            if r[1] != "map-frame" and not (r[2] != "none" and r[3] >= 2):
+                weak.append(r[1])
+        check("R26", "Keyboard: skip link first; every control shows a 2px focus ring",
+              first == "skip-link" and not weak, f"{stops} tab stops, without ring: {weak or 'none'}")
 
         check("R25", "No JavaScript errors during the run", not errors, "; ".join(errors))
         browser.close()

@@ -19,7 +19,7 @@ const path = require("node:path");
 const { calculateOrderTotals, formatPounds } = require("./js/order-rules.js");
 const {
     validateBooking, validateOrderDetails, isValidUkPhone, isValidUkPostcode,
-    toLocalDateString
+    toLocalDateString, validateTestCard
 } = require("./js/form-rules.js");
 const { MENU_FALLBACK } = require("./js/menu-fallback.js");
 
@@ -209,6 +209,36 @@ test("invalid email and postcode are rejected", function () {
     assert.ok(errors.email);
     assert.ok(errors.postcode);
     assert.equal(isValidUkPostcode("E16 2JJ"), true);
+});
+
+/* ── SIMULATED CARD PAYMENT ── */
+
+test("test card 4242 4242 4242 4242 with future expiry and CVC is accepted", function () {
+    assert.deepEqual(validateTestCard({ number: "4242 4242 4242 4242", expiry: "12/30", cvc: "123" }, NOW), {});
+});
+
+test("partial card number with no expiry or CVC is rejected on all three", function () {
+    const errors = validateTestCard({ number: "424242-4242", expiry: "", cvc: "" }, NOW);
+    assert.deepEqual(Object.keys(errors).sort(), ["cvc", "expiry", "number"]);
+});
+
+test("a valid-looking real card number is refused (demo accepts test cards only)", function () {
+    assert.match(validateTestCard({ number: "4111111111111111", expiry: "12/30", cvc: "123" }, NOW).number,
+        /real cards are not accepted/);
+});
+
+test("number failing the Luhn check is rejected", function () {
+    assert.ok(validateTestCard({ number: "4242424242424241", expiry: "12/30", cvc: "123" }, NOW).number);
+});
+
+test("expired card rejected; card valid until end of its expiry month", function () {
+    assert.ok(validateTestCard({ number: "4242424242424242", expiry: "09/26", cvc: "123" }, NOW).expiry);
+    assert.equal(validateTestCard({ number: "4242424242424242", expiry: "10/26", cvc: "123" }, NOW).expiry, undefined);
+    assert.ok(validateTestCard({ number: "4242424242424242", expiry: "13/30", cvc: "123" }, NOW).expiry);
+});
+
+test("security code must be 3 digits", function () {
+    assert.ok(validateTestCard({ number: "4242424242424242", expiry: "12/30", cvc: "12" }, NOW).cvc);
 });
 
 /* ── DATA ── */

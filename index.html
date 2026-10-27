@@ -7,15 +7,15 @@
   <meta name="description" content="Authentic Pan Asian cuisine in London. Open 7 days a week, 4:30PM–11PM. Free delivery within 3 miles. Order online now.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Inter:wght@300;400;500;600&family=Satisfy&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- Load the first hero photo early, at a size that suits the screen (Lighthouse LCP fix) -->
+  <link rel="preload" as="image" fetchpriority="high" href="https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?auto=format&fit=crop&w=1600&q=70" imagesrcset="https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?auto=format&fit=crop&w=800&q=70 800w, https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?auto=format&fit=crop&w=1600&q=70 1600w" imagesizes="100vw">
   <link rel="stylesheet" href="css/style.css">
-  <!-- Stripe.js — loaded in <head> as required by Stripe's security guidelines -->
-  <script src="https://js.stripe.com/v3/"></script>
   <!-- GSAP core and ScrollTrigger plugin -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <!-- Particles.js -->
-  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
 </head>
 <body>
 
@@ -160,10 +160,10 @@
   <div class="container about-grid">
     <div class="about-images">
       <div class="about-img-main reveal">
-        <img src="https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=700&q=80" alt="Pan Asian food spread at Flavours restaurant">
+        <img src="https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?auto=format&fit=crop&w=700&q=70" alt="Pan Asian food spread at Flavours restaurant" width="700" height="525" loading="lazy" decoding="async">
       </div>
       <div class="about-img-accent reveal delay-1">
-        <img src="https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=400&q=80" alt="Fresh ingredients used in our kitchen">
+        <img src="https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&fit=crop&w=400&q=70" alt="Fresh ingredients used in our kitchen" width="400" height="400" loading="lazy" decoding="async">
       </div>
       <div class="about-badge-float" aria-hidden="true">🏆 London's Finest</div>
     </div>
@@ -283,20 +283,36 @@
         </form>
 
         <div class="payment-options">
-          <button type="button" class="btn-primary full-w" id="stripePayBtn">💳 Pay by Card (simulated)</button>
+          <button type="button" class="btn-primary full-w" id="cardPayBtn" aria-expanded="false" aria-controls="cardForm">💳 Pay by Card (simulated)</button>
           <button type="button" class="btn-ghost full-w" id="cashPayBtn">💵 Pay Cash on Collection/Delivery (simulated)</button>
         </div>
-        <div id="paymentMessage" role="status" aria-live="polite"></div>
-        <div class="stripe-wrap" id="stripeWrap" hidden>
+        <!-- Simulated card form: nothing is stored or sent, and only published
+             test card numbers are accepted (validateTestCard in js/form-rules.js) -->
+        <form class="card-form" id="cardForm" novalidate hidden aria-label="Simulated card payment">
           <p class="demo-note">
-            Stripe <strong>test mode</strong>: no real payment is taken. Do not enter real card
-            details – use the test card <strong>4242 4242 4242 4242</strong>, any future expiry date and any CVC.
+            <strong>Simulated payment:</strong> no money is taken and real cards are not accepted.
+            Use the test card <strong>4242 4242 4242 4242</strong>, any future expiry (e.g. 12/30) and any 3-digit code.
           </p>
-          <div id="stripe-card-element" class="stripe-card"></div>
-          <button type="button" id="confirmPayBtn" class="btn-primary full-w confirm-pay-btn">
-            Confirm Demo Order
-          </button>
-        </div>
+          <div class="field">
+            <label for="cardNumber">Card number
+              <input type="text" id="cardNumber" name="cardNumber" inputmode="numeric" autocomplete="off" placeholder="4242 4242 4242 4242" maxlength="19">
+            </label>
+          </div>
+          <div class="card-row">
+            <div class="field">
+              <label for="cardExpiry">Expiry (MM/YY)
+                <input type="text" id="cardExpiry" name="cardExpiry" inputmode="numeric" autocomplete="off" placeholder="12/30" maxlength="5">
+              </label>
+            </div>
+            <div class="field">
+              <label for="cardCvc">Security code
+                <input type="text" id="cardCvc" name="cardCvc" inputmode="numeric" autocomplete="off" placeholder="123" maxlength="3">
+              </label>
+            </div>
+          </div>
+          <button type="submit" id="confirmPayBtn" class="btn-primary full-w">Confirm Demo Order</button>
+        </form>
+        <div id="paymentMessage" role="status" aria-live="polite"></div>
       </div>
 
       <div class="order-info reveal delay-1">
@@ -514,9 +530,9 @@
 
 <!-- Custom scripts loaded at bottom of body so the DOM is ready.
      Order matters: data and rule files define functions used by script.js. -->
-<script src="js/menu-fallback.js"></script>
-<script src="js/order-rules.js"></script>
-<script src="js/form-rules.js"></script>
-<script src="js/script.js"></script>
+<script defer src="js/menu-fallback.js"></script>
+<script defer src="js/order-rules.js"></script>
+<script defer src="js/form-rules.js"></script>
+<script defer src="js/script.js"></script>
 </body>
 </html>

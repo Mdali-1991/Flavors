@@ -37,7 +37,7 @@ Unit Number: A/650/3526 | Credit Value: 16 | GLH: 152
 
 Flavours Pan Asian Food is a single-page interactive restaurant website for a real London-based Pan Asian restaurant at 9 Pier Road, London E16 2JJ. I chose this restaurant because it is a real local business with a full menu, genuine contact details, and a clear need for a better online presence — which made building the site feel purposeful rather than academic.
 
-The site lets customers browse the full menu by category (loaded asynchronously from a JSON data file), add items to a shopping cart with live price updates (including the collection discount and delivery charges), place **simulated** delivery or collection orders (Stripe test-mode card or cash), and send a **simulated** table-booking request that is fully validated before it is accepted.
+The site lets customers browse the full menu by category (loaded asynchronously from a JSON data file), add items to a shopping cart with live price updates (including the collection discount and delivery charges), place **simulated** delivery or collection orders (simulated card payment that accepts test cards only, or cash), and send a **simulated** table-booking request that is fully validated before it is accepted.
 
 **Value to the user:** No need to call the restaurant. Customers can explore 50+ dishes across 11 categories, choose their protein, see the exact total, and confirm their order or table booking in under a minute from any device.
 
@@ -53,14 +53,14 @@ My tutors' assessment outcome was *Further work required before a Pass can be co
 |---|---|---|---|---|
 | 1 | **Booking validation** | `submitBooking()` showed the success message without checking anything, so an empty form was "accepted". My earlier test records for tests 13–15 were wrong. | Every field is now checked by `validateBooking()`: name required; UK phone number format; date required, not in the past, at most 90 days ahead; time within opening hours (4:30pm – 10:30pm last table) and at least 30 minutes ahead for same-day bookings; guests required. Errors appear under each field (`aria-invalid` + `aria-describedby`), focus moves to the first error, and nothing is confirmed until all checks pass. | `js/form-rules.js`, `js/script.js` (`submitBooking`) |
 | 2 | **Order pricing** | The cart total ignored the advertised rules, so a £21.90 collection order stayed £21.90. | `calculateOrderTotals()` applies **10% off collection orders over £20**, **free delivery on £20+**, a **£2 charge on delivery orders under £20**, and the **£10 delivery minimum**. The cart shows subtotal, discount, delivery charge and total, and updates when the order type changes. All maths is in whole pence. £21.90 collection now totals **£19.71**. | `js/order-rules.js`, `js/script.js` (`renderTotals`) |
-| 3 | **Testing documentation** | Tests 13–15 were recorded as Pass when the feature did not work. | Corrected the original records (now shown as Fail), fixed the code, and documented the real retest results: 31 automated unit tests and 25 automated browser checks, all passing. | [Testing](#testing) |
+| 3 | **Testing documentation** | Tests 13–15 were recorded as Pass when the feature did not work. | Corrected the original records (now shown as Fail), fixed the code, and documented the real retest results: 37 automated unit tests and 26 automated browser checks, all passing. | [Testing](#testing) |
 | 4a | **Carousel pause control** | The hero slideshow auto-advanced with no way to stop it (WCAG 2.2.2). | Added a Pause/Play button (`aria-pressed`) that also stops the scrolling dish banner. The slideshow also pauses while the pointer or keyboard focus is inside it, starts paused for users who ask for reduced motion, and hidden slides are `inert` so Tab cannot reach invisible links. | `index.html`, `js/script.js` (`initSlider`) |
 | 4b | **Nested interactive controls** | Menu cards were `role="button"` *and* contained a `<button>` (a control inside a control). | Cards are now plain `<article>` elements; the "+ Add" `<button>` is the only control. A CSS `::after` area keeps the whole card clickable for mouse users. Drinks are single native `<button>`s. The custom keydown handler is no longer needed. | `js/script.js` (`renderDishCard`, `renderDrinkItem`), `css/style.css` |
 | 4c | **Inline code** | 180 lines of menu data inside `script.js`; inline `style` attributes (hero slides, map, payment area); styles set with JavaScript `cssText`; an inline `<style>` and `<script>` in `404.html`. | Moved into external files: `js/menu-fallback.js`, `js/order-rules.js`, `js/form-rules.js`, `css/404.css`, `js/404.js`; hero backgrounds, map, toast and scroll-to-top styles are now CSS classes. No `style=` attributes, inline `<style>`/`<script>` or `on*=` attributes remain in the HTML. | all files |
 | 4d | **Image filenames** | Mixed case (`Screenshot-about.jpeg`) and a typo (`js-vaidator.jpeg`). | Renamed to lowercase: `screenshot-about.jpeg`, `screenshot-contact.jpeg`, `screenshot-halal.jpeg`, `screenshot-menu.jpeg`, `js-validator.jpeg`. | `assets/img/` |
 | 5 | **Demonstration status** | Confirmation messages could be mistaken for real orders or bookings. | A notice banner at the top of every page, notes beside the order form, card form and booking form, a footer note, and every confirmation now begins "DEMO" and says nothing was sent or charged. Buttons are labelled "simulated". | `index.html`, `js/script.js` |
 
-Other problems I found and fixed while retesting are listed in the [Bug Log](#bug-log--found-and-fixed) (bugs 11–20).
+Other problems I found and fixed while retesting are listed in the [Bug Log](#bug-log--found-and-fixed) (bugs 11–27).
 
 ---
 
@@ -75,7 +75,7 @@ User stories follow the format: *As a [type of user], I want [a goal] so that [a
 | US-3 | As a **customer with dietary needs**, I want to see Halal certification and allergen information so that I can order safely. | Hero badge, About section stats, booking form "Special Requests" field |
 | US-4 | As a **mobile user**, I want the site to work well on my phone so that I can order on the go. | Responsive CSS Grid layout; hamburger nav; 44px touch targets on cards |
 | US-5 | As a **customer choosing proteins**, I want to change the protein on noodle dishes and see the updated price so that I know the exact cost before adding to cart. | Protein `<select>` dropdown; `change` event via delegation updates card price and `aria-label` |
-| US-6 | As a **customer ready to order**, I want to add items to a cart, see the correct total for delivery or collection, and pay by card or cash so that I can complete my order online. | Cart with subtotal / collection discount / delivery charge / total; Stripe.js test-mode card element and cash path (simulated – clearly labelled) |
+| US-6 | As a **customer ready to order**, I want to add items to a cart, see the correct total for delivery or collection, and pay by card or cash so that I can complete my order online. | Cart with subtotal / collection discount / delivery charge / total; simulated card form (test cards only) and cash path – clearly labelled as simulated |
 | US-7 | As a **customer who wants to visit in person**, I want to book a table online so that I can reserve a spot without calling. | Booking form validated field by field (name, UK phone, date, opening-hours time, guests) with inline errors; demo confirmation only when valid |
 | US-8 | As a **user with a disability**, I want to navigate the site using a keyboard and screen reader so that I can use the site without a mouse. | Native `<button>` controls (no nested controls); skip link; slideshow Pause button; visible focus rings; errors linked with `aria-describedby` |
 | US-9 | As a **user who mistyped a URL**, I want to be redirected back to the main site automatically so that I am not stranded on an error page. | `404.html` with 5-second countdown auto-redirect using `window.location.replace()` |
@@ -133,7 +133,7 @@ I decided to build the tab navigation without a JavaScript framework — pure DO
 
 ![Order and cart wireframe](assets/img/wireframe-cart.svg)
 
-*Two-column layout: left panel holds the live cart (items + totals + form + payment buttons), right panel holds static info cards (hours, delivery, collection, phone). Stripe card element mounts inside the left panel on demand.*
+*Two-column layout: left panel holds the live cart (items + totals + form + payment buttons), right panel holds static info cards (hours, delivery, collection, phone). The simulated card form opens inside the left panel on demand.*
 
 ### Table Booking Section
 
@@ -152,7 +152,7 @@ I decided to build the tab navigation without a JavaScript framework — pure DO
 ## File Structure
 
 ```
-flavors/
+Flavors/
 ├── index.html                        ← Main page
 ├── 404.html                          ← Custom error page with auto-redirect
 ├── css/
@@ -164,8 +164,8 @@ flavors/
 │   ├── form-rules.js                 ← Booking and order-form validation rules
 │   ├── script.js                     ← Page behaviour: menu, cart, forms, slideshow
 │   └── 404.js                        ← 404 countdown and redirect
-├── rules.test.js                     ← 31 automated unit tests (Node.js)
-├── browser_retest.py                 ← 25 automated browser checks (Playwright)
+├── rules.test.js                     ← 37 automated unit tests (Node.js)
+├── browser_retest.py                 ← 26 automated browser checks (Playwright)
 └── assets/
     ├── data/
     │   └── menu.json                 ← Menu data (fetched at runtime via fetch API)
@@ -233,8 +233,7 @@ Menu data is stored in `assets/data/menu.json` and fetched asynchronously at run
 | Vanilla JavaScript | ES2020 (ES11) | `async/await`, `fetch`, `IntersectionObserver`, event delegation |
 | GSAP + ScrollTrigger | 3.12.5 | Hero entrance animation and scroll-triggered stat counter |
 | Particles.js | 2.0.0 | Ambient particle layer in the hero section |
-| Stripe.js | v3 | Card payment UI (test keys; production pattern documented in code) |
-| Google Fonts | — | Playfair Display, Inter, Satisfy |
+| Google Fonts | — | Playfair Display, Inter |
 | Netlify | — | Cloud deployment and 404 handling |
 | Git / GitHub | — | Version control and source hosting |
 
@@ -381,7 +380,7 @@ I created wireframes for the four main sections (hero, menu, order/cart, and boo
 Actions taken:
 
 - Produced wireframes for Hero, Menu, Order/Cart, Booking, and Mobile views (see Wireframes section)
-- Selected typography: Playfair Display (headings — premium restaurant feel), Inter (body — highly legible on screens), Satisfy (used sparingly as accent — warmth and personality)
+- Selected typography: Playfair Display (headings — premium restaurant feel), Inter (body — highly legible on screens), Satisfy (used sparingly as accent — warmth and personality) *(Satisfy was later removed because no element used it — it was only adding download time.)*
 - Defined colour palette: `#1A1A1A` deep charcoal background, `#E8400C` fire orange primary, `#D4A017` amber/gold accent, `#F5F0E8` warm off-white text — all as CSS custom properties so the entire colour scheme can be changed in one place
 - Designed the menu card grid to use `repeat(auto-fill, minmax(280px, 1fr))` — this decision came from the wireframe stage, where I realised fixed column counts would break on unusual screen sizes
 
@@ -392,7 +391,7 @@ Order of implementation:
 1. HTML structure and semantic markup (all sections, forms, nav)
 2. CSS base styles — custom properties, reset, grid/flexbox layout
 3. JavaScript — `buildMenu()` async function, category tab switching, event delegation for cart
-4. Stripe.js integration (card element, payment intent flow with test keys)
+4. Card payment demo (first submission: Stripe.js card element with a placeholder test key; replaced at reassessment by a self-contained simulated card form — Bug Log #23)
 5. Booking form with HTML5 validation and custom error display
 6. 404 page with countdown timer and `window.location.replace()`
 7. Accessibility pass — added all `aria-*`, `role`, `tabindex`, `label for`
@@ -471,7 +470,7 @@ Each commit was pushed to GitHub so the full development timeline is visible in 
 
 **Manual testing** involves a human tester interacting with the application and checking that it behaves as expected. It is most appropriate when testing user experience, visual layout, accessibility (e.g. keyboard navigation, screen-reader announcements), and edge cases that are difficult to predict in advance. For this project, manual testing was the primary approach because the application is front-end only — all features involve DOM interaction, CSS rendering, and user flow, which are best verified by a real person using a real browser. Manual testing is also appropriate at the deployment stage to confirm that the hosted version matches the development version.
 
-**Automated testing** uses code (e.g. unit tests, end-to-end test frameworks like Jasmine or Cypress) to assert that specific functions return expected outputs. It is most appropriate for logic-heavy functions where inputs and outputs are predictable — for example, a price calculation function that should always return a specific total given specific quantities. Automated testing runs faster than manual testing for regression checks after code changes, but cannot easily test visual appearance, user experience, or browser-specific rendering. For this project, the JavaScript logic (cart total calculation, input validation, menu rendering) would be suitable candidates for automated unit tests; however, the core interactive features (GSAP animations, Stripe card element, Particles.js layer) cannot be meaningfully unit-tested and require manual verification.
+**Automated testing** uses code (e.g. unit tests, end-to-end test frameworks like Jasmine or Cypress) to assert that specific functions return expected outputs. It is most appropriate for logic-heavy functions where inputs and outputs are predictable — for example, a price calculation function that should always return a specific total given specific quantities. Automated testing runs faster than manual testing for regression checks after code changes, but cannot easily test visual appearance, user experience, or browser-specific rendering. For this project, the JavaScript logic (cart total calculation, input validation, menu rendering) would be suitable candidates for automated unit tests; however, the core interactive features (GSAP animations, Particles.js layer) cannot be meaningfully unit-tested and require manual verification.
 
 In summary: manual testing was used throughout this project for UI, accessibility, and cross-browser checks; automated tool-based testing (W3C validator, JSHint, Lighthouse) was used to verify code quality and accessibility scores.
 
@@ -513,7 +512,7 @@ In summary: manual testing was used throughout this project for UI, accessibilit
 | 7 | Protein selector | Noodles tab → change protein dropdown | Card price and aria-label update | Price and label both update | Pass |
 | 8 | Keyboard — Enter | Tab to card → press Enter | Item added to cart | Item added, but card was a control nested around another control (found by tutor) | Pass (redesigned, see R16–R17) |
 | 9 | Keyboard — Space | Tab to card → press Space | Item added to cart | Item added (as test 8) | Pass (redesigned, see R16–R17) |
-| 10 | Stripe payment | Fill order form → "Pay by Card" | Card element appears | Stripe card element mounts | Pass |
+| 10 | Card payment | Fill order form → "Pay by Card" | Card element appears | Stripe card element mounted, but on the live site confirming could show nothing (Bug Log #22–23) | Pass at the time → replaced, see R15 |
 | 11 | Cash payment | Fill order form → "Pay by Cash" | Success message, cart cleared | Success shown, cart empty | Pass |
 | 12 | Empty cart order | Click Pay without adding items | Error message prompting to add items | Defensive check fires | Pass |
 | 13 | Table booking — valid | Fill all required fields → Reserve | Success confirmation replaces form | Confirmation shown — but it was also shown for an **empty** form, so the test did not prove validation | **Fail** (corrected record) → fixed, see R1, R8 |
@@ -540,7 +539,7 @@ Tests 25–29 and the validation screenshots below were recorded **before** the 
 
 #### Automated unit tests — `rules.test.js`
 
-Run with `node --test` (Node.js 18+, no packages needed). **Result: 31 / 31 passed.**
+Run with `node --test` (Node.js 18+, no packages needed). **Result: 37 / 37 passed.**
 
 | Area | What is tested | Result |
 |---|---|---|
@@ -553,11 +552,12 @@ Run with `node --test` (Node.js 18+, no packages needed). **Result: 31 / 31 pass
 | Booking — time | 16:00 and 22:45 rejected; 16:30 and 22:30 accepted; same-day booking needs 30 minutes' notice | Pass |
 | Booking — other | Guests required; special requests over 200 characters rejected | Pass |
 | Order details | Delivery needs address, postcode and 3-mile confirmation; collection does not; bad email/postcode rejected | Pass |
+| Simulated card | `4242 4242 4242 4242`, 12/30, 123 accepted; partial number with no expiry/code rejected on all three; real card `4111…` refused; failed checksum, expired date, month 13 and 2-digit code rejected | Pass |
 | Data | `MENU_FALLBACK` identical to `menu.json` | Pass |
 
 #### Automated browser retest — `browser_retest.py`
 
-The real `index.html` was opened in headless Chromium (Playwright, Europe/London time zone) and each fix was exercised the way a user would. Stripe.js was replaced with a small mock for R15 because the test machine had no internet access; the real Stripe card field is checked manually (M1). **Result: 25 / 25 passed** (21 October 2026).
+The real `index.html` was opened in headless Chromium (Playwright, Europe/London time zone) and each fix was exercised the way a user would. **Result: 26 / 26 passed** (22 October 2026).
 
 | # | Test | Actual result | Result |
 |---|---|---|---|
@@ -575,7 +575,7 @@ The real `index.html` was opened in headless Chromium (Playwright, Europe/London
 | R12 | Delivery, Tofu Mari only (£5.95) → Pay cash | Blocked: "Delivery needs a minimum spend of £10.00. Add £4.05 more, or choose collection." | Pass |
 | R13 | Delivery order with empty details | Name, phone, email, address, postcode and 3-mile tick all flagged (6) | Pass |
 | R14 | Valid collection order, cash | "✅ DEMO collection order (pay cash on collection) – total £19.71 (subtotal £21.90, collection discount -£2.19)… No payment has been taken."; cart cleared | Pass |
-| R15 | Card payment (mock Stripe) | Blocked until card complete; then "✅ DEMO collection order (simulated card payment) – total £19.71…" | Pass |
+| R15 | Card payment on a phone-sized screen: partial number `424242-4242`; then `4111 1111 1111 1111`; then `4242 4242 4242 4242`, 12/30, 123 | Partial number: card number, expiry and code all flagged, "Payment not taken". 4111…: "Demo site: real cards are not accepted". Test card: "✅ DEMO collection order (simulated card payment) – total £19.71…" shown in a green box, scrolled into view | Pass |
 | R16 | Nested interactive controls | 0 found; no menu card has `role` or `tabindex` | Pass |
 | R17 | Keyboard: Enter and Space on "+ Add" | Item added twice | Pass |
 | R18 | Press Pause, wait 6.5 s | `aria-pressed="true"`, button reads "Play", slide unchanged, banner paused | Pass |
@@ -586,18 +586,19 @@ The real `index.html` was opened in headless Chromium (Playwright, Europe/London
 | R23 | Demo notices | Banner visible; notes beside order, card and booking forms | Pass |
 | R24 | 404 page at a nested missing URL | External `404.css` loads | Pass |
 | R25 | Console | No JavaScript errors | Pass |
+| R26 | Tab through the whole page | Skip link is the first stop; all 95 page controls show a 2 px gold focus ring (the embedded Google map shows its own focus markers) | Pass |
 
 Also checked in the browser: no horizontal scrolling at 320 px, 375 px, 768 px and 1280 px wide (320 px previously scrolled sideways — Bug Log #20); slideshow controls visible on mobile (previously covered by the badges — Bug Log #18). A scan of both HTML files finds no `style=` attributes, inline `<style>`/`<script>` blocks or `on*=` attributes, and no upper-case filenames remain.
 
 #### Manual retest on the live site (https://fpafood.netlify.app)
 
-These need a real browser with internet access, so they were carried out by hand on the live site.
+M2 and M3 were carried out with an automated keyboard walk-through and an accessibility-tree inspection in Chromium, using files identical to the deployed site. M1, M4, M5 and M6 need a real browser with internet access and are carried out by hand on the live site.
 
 | # | Test | Expected | Actual | Result |
 |---|---|---|---|---|
-| M1 | Pay by Card → enter `4242 4242 4242 4242`, any future date, any CVC → Confirm | Stripe card field appears; "DEMO … simulated card payment" message; no charge | | |
-| M2 | Keyboard only: Tab from the top of the page | Skip link appears first; Pause button reachable; visible focus on every control | | |
-| M3 | Screen reader (VoiceOver/NVDA) on a menu item and the booking errors | "+ Add" button reads dish and price; each error is read with its field | | |
+| M1 | On a phone: Pay by Card → enter `4242 4242 4242 4242`, `12/30`, `123` → Confirm Demo Order | Green "DEMO … simulated card payment" box appears; a real card number is refused | | |
+| M2 | Keyboard only: Tab from the top of the page | Skip link appears first; Pause button reachable; visible focus on every control | Skip link first, then demo-banner phone link, navigation, visible slide's buttons, **Pause**, slide controls, menu tabs, "+ Add" buttons, order and booking forms, footer (96 stops). Hidden slides skipped. Form fields, the 3-mile checkbox and date/time pickers had only a faint border change or no indicator — fixed (Bug Log #21), now a 2 px gold ring everywhere (R26). | Pass (after fix) |
+| M3 | Accessibility tree (what screen readers receive) for a menu item and the booking errors | "+ Add" button reads dish and price; each error is read with its field | Menu item: article → heading "Pad Thai" (level 3) → button "Add Pad Thai (Chicken) to cart, £10.95". Booking: every field has its label as its name; after an empty submit each field is marked invalid with its error linked, and the status message reads "Your booking has not been sent. Please correct 5 fields above." | Pass |
 | M4 | W3C HTML validator (`index.html`, `404.html`); W3C CSS validator (`style.css`, `404.css`); JSHint (all files in `js/`) | No errors | | |
 | M5 | Lighthouse (mobile) | Accessibility ≥ 90 | | |
 | M6 | Chrome, Firefox, Safari, mobile Safari/Chrome | Booking, pricing and Pause work as in R1–R19 | | |
@@ -610,6 +611,7 @@ These need a real browser with internet access, so they were carried out by hand
 | W3C HTML Validator (`validator.w3.org`) | `404.html` | 0 errors |
 | W3C CSS Jigsaw (`jigsaw.w3.org`) | `css/style.css` | 0 errors |
 | JSHint (`jshint.com`, `esversion:11`, `unused:true`) | `js/script.js` | 0 errors |
+| ESLint 10 (`no-undef`, `no-unused-vars`, `eqeqeq`, `curly`, `semi`, `no-redeclare`) — reassessment, 22 Oct 2026 | all 5 files in `js/` | 0 errors, 0 warnings |
 | Lighthouse (Chrome DevTools) | `index.html` | Accessibility 97, Best Practices 100 |
 
 ### Validation Screenshots
@@ -672,9 +674,9 @@ The screenshots below were captured from the live Netlify deployment for the fir
 
 #### US-6 — Cart panel and payment options
 
-![Cart side panel open showing items, total, and Stripe card element](assets/img/screenshot-cart.png)
+![Cart with items, total and payment options](assets/img/screenshot-cart.png)
 
-*Itemised list of added dishes with quantities and prices, Stripe card input and cash option. Since reassessment the cart also shows the subtotal, collection discount, delivery charge and total (see R9–R12), and the payment buttons are labelled "simulated".*
+*Itemised list of added dishes with quantities and prices, card and cash options (first submission shown). Since reassessment the cart also shows the subtotal, collection discount, delivery charge and total (see R9–R12), and the payment buttons are labelled "simulated".*
 
 #### US-7 — Table booking form with validation
 
@@ -726,12 +728,19 @@ The screenshots below were captured from the live Netlify deployment for the fir
 | 18 | On phones the badge strip covered the slideshow controls | Badges positioned over the bottom of the hero | Badges placed below the slideshow on screens ≤ 768 px | reassessment |
 | 19 | Correcting a field then clicking a button sometimes did nothing (found by browser retest) | Errors cleared on `blur`, moving the button mid-click | Errors now re-checked on `input`/`change` | reassessment |
 | 20 | Page scrolled sideways at 320 px | 320 px minimum card width; long email address; footer links not wrapping | Single-column menu grid below 380 px; long links and footer links wrap | reassessment |
+| 21 | Form fields, the 3-mile checkbox and date/time pickers had a faint or missing keyboard focus indicator (found in M2) | Global `outline: none` on inputs; only the border colour changed, and checkboxes have no visible border | Gold 2 px outline on `:focus-visible` for all links, buttons and form fields; `:focus-within` for date/time pickers | reassessment |
+| 22 | After a card order the confirmation disappeared, so nothing seemed to happen (found when testing the live site) | Clearing the card field after the order fires Stripe's `change` event, whose handler cleared the message; on phones the message was also below the visible area | The handler now only clears error messages; the confirmation is shown last, scrolled into view, focused and styled as a green box (R15 now checks this) | reassessment |
+| 23 | Entering card details and pressing Confirm could still show nothing on the live site (found when testing on a phone) | The card field depended on Stripe.js with a placeholder (not real) publishable key, so it could fail or never report the card as complete, with no visible feedback | Replaced Stripe with a self-contained simulated card form validated by `validateTestCard()`: errors under each field, a "Payment not taken" message, only published test card numbers accepted (real cards refused), nothing stored or sent; the external Stripe script was removed | reassessment |
+| 24 | W3C HTML validator: "Stray end tag div" (found in M4) | An extra `</div>` was left when the card form replaced the Stripe markup, closing the order layout early so the info cards fell out of the two-column grid | Removed the extra tag; tag nesting checked for both pages | reassessment |
+| 25 | Lighthouse mobile Performance 66: Largest Contentful Paint 10.7 s (found in M5) | Animation libraries blocked rendering; the first hero photo was found late and downloaded at 1600 px even on phones; the loader waited for every image, font and the map plus 1.6 s; an unused font (Satisfy) was downloaded | Scripts `defer`red; first hero photo preloaded with a phone-sized version; 800 px hero photos on phones and WebP/AVIF via `auto=format`; menu photos 1200 → 900 px; About photos lazy-loaded; loader hides 0.4 s after the page is ready; unused font removed | reassessment |
+| 26 | Lighthouse: slide dots too small to tap (8×8 px) (found in M5) | Dots were tiny buttons | Each dot is now a 24×24 px button with the same 8 px dot drawn inside, so the design is unchanged | reassessment |
+| 27 | JSHint: style warnings on all JavaScript files (found in M4) | Global `"use strict"` not declared as intended; `+`/`&&`/`?` at the start of continued lines | Declared `strict: global`; operators moved to line ends (formatting only) | reassessment |
 
 ### Unfixed Bugs
 
 | # | Bug | Reason Not Fixed |
 |---|---|---|
-| U-1 | Stripe card element does not complete a real payment transaction | Requires a server-side payment intent (Node.js/Python backend). This project is a static front-end only; Stripe is integrated in test/UI-demonstration mode. A real backend is outside the scope of Unit 2. **The site now states clearly that payment is simulated.** |
+| U-1 | Card payment does not take a real payment | Requires a payment provider and a server (Node.js/Python backend). This project is a static front-end only, so card payment is a simulated form that accepts test cards only. A real backend is outside the scope of Unit 2. **The site states clearly that payment is simulated.** |
 | U-2 | Orders and table bookings are not sent anywhere or saved | Requires a backend API. The forms demonstrate validation, submission handling and user feedback. **The site now states clearly that ordering and booking are simulated.** |
 | U-5 | The 3-mile delivery radius is not measured | Measuring distance needs a geocoding/maps API key. The customer must enter a valid UK postcode and confirm they are within 3 miles. |
 | U-3 | On Safari iOS 16, CSS `clamp()` with `vi` units falls back to a fixed value | `clamp()` with viewport-relative units unsupported in Safari < 16.4. Text remains readable; only fluid scaling affected. Fix would require a PostCSS polyfill. |
@@ -747,7 +756,7 @@ The site is deployed to **Netlify**. There is no build step.
 
 1. Log in to [netlify.com](https://www.netlify.com).
 2. Click **"Add new site" → "Deploy manually"**.
-3. Drag the entire `flavors/` project folder into the upload area (or, if the site is linked to the GitHub repository, Netlify redeploys automatically on every push to `main`).
+3. Drag the entire project folder into the upload area (or, if the site is linked to the GitHub repository, Netlify redeploys automatically on every push to `main`).
 4. Netlify assigns a URL (e.g. `https://flavours-pan-asian.netlify.app`). Update the live URL in this README.
 5. Netlify automatically serves `404.html` for any unmatched route if `404.html` exists at root. To explicitly configure it, add a `_redirects` file at root:
 
@@ -770,8 +779,10 @@ Note: `404.html` uses root-relative paths (`/css/style.css`) for Netlify. On a G
 No build step is needed. The `fetch("assets/data/menu.json")` call requires a local HTTP server (browsers block `file://` fetch requests):
 
 ```bash
+git clone https://github.com/Mdali-1991/Flavors.git
+cd Flavors
+
 # Python 3
-cd flavors
 python -m http.server 8080
 # Open http://localhost:8080
 
@@ -817,8 +828,7 @@ Hero and about-section photographs: [Unsplash](https://unsplash.com) — free to
 | [GSAP](https://gsap.com) by GreenSock | Hero entrance and stat counter animations | GreenSock Standard Licence (free for non-commercial) |
 | [ScrollTrigger](https://gsap.com/docs/v3/Plugins/ScrollTrigger/) | Scroll-triggered reveal animations | Bundled with GSAP |
 | [Particles.js](https://github.com/VincentGarreau/particles.js/) by Vincent Garreau | Ambient particle layer in hero | MIT Licence |
-| [Stripe.js](https://stripe.com/docs/js) | Card payment UI component | Stripe Proprietary |
-| [Google Fonts](https://fonts.google.com) | Playfair Display, Inter, Satisfy | Open Font Licence |
+| [Google Fonts](https://fonts.google.com) | Playfair Display, Inter | Open Font Licence |
 | [Google Maps Embed API](https://developers.google.com/maps/documentation/embed) | Location map | Google Maps Platform Terms |
 | MDN Web Docs | `IntersectionObserver`, `async/await`, `fetch` API reference | Reference documentation |
 
@@ -847,7 +857,7 @@ Several AI tools were used during development as coding assistants, in the same 
 - Planned all user stories and mapped them to grading criteria before writing any code
 - Produced all wireframes (see Wireframes section) before beginning development
 - Made all architectural decisions: vanilla JS over a framework, JSON data file over inline constants, event delegation over per-card listeners, CSS Grid over explicit breakpoints
-- Wrote and debugged the core logic: `buildMenu()` async fetch with fallback, `initMenuEvents()` delegation, `validateOrder()`, `submitBooking()`, the Stripe integration pattern
+- Wrote and debugged the core logic: `buildMenu()` async fetch with fallback, `initMenuEvents()` delegation, `validateOrder()`, `submitBooking()`, the original Stripe integration
 - Performed all manual testing across six browsers and two viewport sizes
 - Wrote the deployment steps, bug log, and test case table from my own testing notes
 
