@@ -483,10 +483,19 @@ function renderMenuPanels(container, data) {
         panel.setAttribute("role", "region");
         panel.setAttribute("aria-label", catData.label);
 
+        /* Phones get a 600 or 750px-wide photo, larger screens 900px (Lighthouse
+           "Improve image delivery"). Only Unsplash URLs with w=900 get a srcset. */
+        const imgSrc = catData.img;
+        const srcset = /[?&]w=900\b/.test(imgSrc) ?
+            " srcset=\"" + escapeHtml(imgSrc.replace(/([?&])w=900\b/, "$1w=600")) + " 600w, " +
+                escapeHtml(imgSrc.replace(/([?&])w=900\b/, "$1w=750")) + " 750w, " +
+                escapeHtml(imgSrc) + " 900w\"" +
+                " sizes=\"(max-width: 700px) 100vw, 1150px\"" :
+            "";
         let html = "<img class=\"panel-hero-img\"" +
-            " src=\"" + escapeHtml(catData.img) + "\"" +
+            " src=\"" + escapeHtml(imgSrc) + "\"" + srcset +
             " alt=\"" + escapeHtml(catData.label) + " dishes\"" +
-            " loading=\"lazy\">";
+            " width=\"900\" height=\"260\" loading=\"lazy\" decoding=\"async\">";
 
         if (catData.pricingTable) {
             html += renderProteinSelector(cat, catData.pricingTable);
@@ -602,6 +611,7 @@ function initSlider() {
 
     function goToSlide(n) {
         current = (n + slides.length) % slides.length;
+        if (current !== 0 && slidesWrap) { slidesWrap.classList.add("load-all"); }
         slides.forEach(function (slide, i) {
             const isActive = i === current;
             slide.classList.toggle("active", isActive);
@@ -671,7 +681,25 @@ function initSlider() {
     });
 
     goToSlide(0);
+    /* Start auto-rotation only once the page has fully loaded, so the
+       slideshow does not change what is on screen while the page is still
+       being drawn on slow connections (Lighthouse Speed Index / LCP). */
+    /* Photos for slides 2–4 are only downloaded after the page has loaded
+       (CSS: .hero-slides.load-all), or as soon as the user changes slide. */
+    function loadAllSlides() {
+        if (slidesWrap) { slidesWrap.classList.add("load-all"); }
+    }
+
     updatePauseState();
+    if (document.readyState === "complete") {
+        loadAllSlides();
+    } else {
+        stop();
+        window.addEventListener("load", function () {
+            loadAllSlides();
+            start();
+        });
+    }
 }
 
 /* ── NAVBAR ── */
@@ -763,6 +791,38 @@ function initTilt() {
     });
 }
 
+/* ── EFFECTS: load the animation libraries after the page has loaded ──
+   GSAP + ScrollTrigger (About-section number counters) and Particles.js
+   (hero background) used to be <script> tags in the <head>. They are only
+   decoration, so they are now fetched once the page has finished loading,
+   and not at all for users who ask for reduced motion. */
+
+const EFFECT_SCRIPTS = Object.freeze({
+    gsap: "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js",
+    scrollTrigger: "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js",
+    particles: "https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"
+});
+
+function loadScript(src, onReady) {
+    const script = document.createElement("script");
+    script.src = src;
+    script.async = true;
+    script.addEventListener("load", onReady);
+    script.addEventListener("error", function () {
+        console.warn("Optional effect could not load: " + src);
+    });
+    document.head.appendChild(script);
+}
+
+function loadEffects() {
+    if (prefersReducedMotion) { return; }
+    loadScript(EFFECT_SCRIPTS.particles, initParticles);
+    loadScript(EFFECT_SCRIPTS.gsap, function () {
+        /* ScrollTrigger is a GSAP plugin, so it must load after GSAP */
+        loadScript(EFFECT_SCRIPTS.scrollTrigger, initGSAP);
+    });
+}
+
 /* ── PARTICLES.JS (skipped for reduced motion) ── */
 
 function initParticles() {
@@ -804,15 +864,10 @@ function initGSAP() {
     if (typeof gsap === "undefined" || prefersReducedMotion) { return; }
     gsap.registerPlugin(ScrollTrigger);
 
-    gsap.from(".hero-slide.active .hero-title", {
-        duration: 1.2, y: 60, opacity: 0, ease: "power3.out", delay: 0.3
-    });
-    gsap.from(".hero-slide.active .slide-tag", {
-        duration: 0.8, y: 30, opacity: 0, ease: "power2.out", delay: 0.1
-    });
-    gsap.from(".hero-slide.active .hero-btns", {
-        duration: 1, y: 40, opacity: 0, ease: "power2.out", delay: 0.6
-    });
+    /* The hero entrance animation is now pure CSS (heroIntro keyframes in
+       style.css). It used to be gsap.from(): GSAP arrives from a CDN, so on
+       slow mobile data the headline appeared, vanished and faded back in —
+       a visible flicker that also delayed Largest Contentful Paint. */
 
     document.querySelectorAll(".stat strong").forEach(function (el) {
         const raw = el.textContent.replace(/[^0-9]/g, "");
@@ -1200,19 +1255,6 @@ function initBookingForm() {
     }
 }
 
-/* ── PAGE LOADER ── */
-
-/* Hide the brand loader shortly after the page is ready. It used to wait
-   for every image, font and the map to finish downloading ("load") plus
-   1.6 s, which kept phones on a blank screen for several seconds
-   (Lighthouse performance fix). This runs from DOMContentLoaded. */
-function initLoader() {
-    setTimeout(function () {
-        const loader = document.getElementById("loader");
-        if (loader) { loader.classList.add("hidden"); }
-    }, prefersReducedMotion ? 0 : 400);
-}
-
 /* ── SCROLL-TO-TOP BUTTON (styles in css/style.css → .scroll-top) ── */
 
 function initScrollTop() {
@@ -1234,7 +1276,6 @@ function initScrollTop() {
 /* ── INIT: wire everything up on DOMContentLoaded ── */
 
 document.addEventListener("DOMContentLoaded", function () {
-    initLoader();
     initNavbar();
 
     initMenuTabs();
@@ -1244,8 +1285,13 @@ document.addEventListener("DOMContentLoaded", function () {
     initSlider();
     initReveal();
     initTilt();
-    initParticles();
-    initGSAP();
+    /* Animation libraries are decoration: fetch them only once the page has
+       fully loaded, so they never compete with the first screen. */
+    if (document.readyState === "complete") {
+        loadEffects();
+    } else {
+        window.addEventListener("load", loadEffects);
+    }
     initOrderType();
     initPayments();
     initCartEvents();
