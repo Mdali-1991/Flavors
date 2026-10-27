@@ -18,6 +18,7 @@
 
 /* global module */
 /* exported ORDER_RULES, toPence, formatPounds, calculateOrderTotals */
+/* jshint strict: global */
 "use strict";
 
 const ORDER_RULES = Object.freeze({
@@ -71,26 +72,26 @@ function calculateOrderTotals(items, orderType) {
             notes.push("10% collection discount applied.");
         } else {
             notes.push(
-                "Spend over " + formatPounds(rules.COLLECTION_DISCOUNT_THRESHOLD_PENCE)
-                + " to get 10% off collection."
+                "Spend over " + formatPounds(rules.COLLECTION_DISCOUNT_THRESHOLD_PENCE) +
+                " to get 10% off collection."
             );
         }
     } else {
         if (subtotal < rules.DELIVERY_MINIMUM_PENCE) {
             canCheckout = false;
             notes.push(
-                "Delivery needs a minimum spend of "
-                + formatPounds(rules.DELIVERY_MINIMUM_PENCE)
-                + ". Add " + formatPounds(rules.DELIVERY_MINIMUM_PENCE - subtotal)
-                + " more, or choose collection."
+                "Delivery needs a minimum spend of " +
+                formatPounds(rules.DELIVERY_MINIMUM_PENCE) +
+                ". Add " + formatPounds(rules.DELIVERY_MINIMUM_PENCE - subtotal) +
+                " more, or choose collection."
             );
         } else if (subtotal < rules.FREE_DELIVERY_THRESHOLD_PENCE) {
             deliveryCharge = rules.SMALL_ORDER_DELIVERY_CHARGE_PENCE;
             notes.push(
-                formatPounds(deliveryCharge) + " delivery charge on orders under "
-                + formatPounds(rules.FREE_DELIVERY_THRESHOLD_PENCE)
-                + ". Add " + formatPounds(rules.FREE_DELIVERY_THRESHOLD_PENCE - subtotal)
-                + " more for free delivery."
+                formatPounds(deliveryCharge) + " delivery charge on orders under " +
+                formatPounds(rules.FREE_DELIVERY_THRESHOLD_PENCE) +
+                ". Add " + formatPounds(rules.FREE_DELIVERY_THRESHOLD_PENCE - subtotal) +
+                " more for free delivery."
             );
         } else {
             notes.push("Free delivery within 3 miles.");

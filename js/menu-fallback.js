@@ -15,12 +15,13 @@
 
 /* global module */
 /* exported MENU_FALLBACK */
+/* jshint strict: global */
 "use strict";
 
 const MENU_FALLBACK = {
   "appetisers": {
     "label": "Appetisers",
-    "img": "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=1200&q=80",
+    "img": "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=900&q=70",
     "items": [
       { "name": "Prawn Crackers", "desc": "Thai Prawn Crackers served with sweet chilli sauce.", "price": 3.95, "emoji": "🦐" },
       { "name": "Veg Spring Roll", "desc": "Crispy spring rolls with vegetable filling. Sweet chilli sauce.", "price": 5.50, "emoji": "🥟", "tags": ["veg"] },
@@ -49,7 +50,7 @@ const MENU_FALLBACK = {
   },
   "soup": {
     "label": "Soup",
-    "img": "https://images.unsplash.com/photo-1547592180-85f173990554?w=1200&q=80",
+    "img": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=70",
     "items": [
       { "name": "Tom Yum Soup – Chicken", "desc": "Thailand's iconic hot & sour soup, vibrant balance of spicy, sour, salty & savoury. Lemongrass, mushrooms, fresh herbs.", "price": 5.95, "emoji": "🍲", "tags": ["hot"] },
       { "name": "Tom Yum Soup – Prawn", "desc": "Hot & sour prawn soup. Lemongrass, mushrooms, fresh herbs.", "price": 6.95, "emoji": "🍲", "tags": ["hot"] },
@@ -59,7 +60,7 @@ const MENU_FALLBACK = {
   },
   "salad": {
     "label": "Salad",
-    "img": "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=1200&q=80",
+    "img": "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&fit=crop&w=900&q=70",
     "items": [
       { "name": "Papaya Salad – Prawn", "desc": "Shredded green papaya, chilli, cherry tomatoes, cucumber, carrots, fine beans. Fresh, spicy, tangy, lime. Roasted peanuts.", "price": 10.95, "emoji": "🥗", "tags": ["hot"] },
       { "name": "Papaya Salad – Veg", "desc": "Shredded green papaya, chilli, cherry tomatoes, cucumber, carrots, fine beans. Garlic dressing. Roasted peanuts.", "price": 8.95, "emoji": "🥗", "tags": ["veg"] },
@@ -68,7 +69,7 @@ const MENU_FALLBACK = {
   },
   "noodles": {
     "label": "Noodles",
-    "img": "https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=1200&q=80",
+    "img": "https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?auto=format&fit=crop&w=900&q=70",
     "pricingTable": [
       { "protein": "Chicken", "price": "£10.95" },
       { "protein": "Beef",    "price": "£12.95" },
@@ -89,7 +90,7 @@ const MENU_FALLBACK = {
   },
   "curries": {
     "label": "Curries",
-    "img": "https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=1200&q=80",
+    "img": "https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?auto=format&fit=crop&w=900&q=70",
     "pricingTable": [
       { "protein": "Chicken", "price": "£10.95" },
       { "protein": "Beef",    "price": "£12.95" },
@@ -107,7 +108,7 @@ const MENU_FALLBACK = {
   },
   "rice": {
     "label": "Rice",
-    "img": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=1200&q=80",
+    "img": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=900&q=70",
     "pricingTable": [
       { "protein": "Chicken", "price": "£10.95" },
       { "protein": "Beef",    "price": "£12.95" },
@@ -126,7 +127,7 @@ const MENU_FALLBACK = {
   },
   "sides": {
     "label": "Side Dishes",
-    "img": "https://images.unsplash.com/photo-1541518763669-27fef04b14ea?w=1200&q=80",
+    "img": "https://images.unsplash.com/photo-1541518763669-27fef04b14ea?auto=format&fit=crop&w=900&q=70",
     "items": [
       { "name": "Chips", "desc": "Classic crispy chips.", "price": 2.50, "emoji": "🍟", "tags": ["veg"] },
       { "name": "Spicy Chilli Chips", "desc": "Chips tossed in sweet and spicy sauce.", "price": 3.95, "emoji": "🍟", "tags": ["hot"] },
@@ -145,7 +146,7 @@ const MENU_FALLBACK = {
   },
   "specials": {
     "label": "Flavours Specials",
-    "img": "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=1200&q=80",
+    "img": "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?auto=format&fit=crop&w=900&q=70",
     "items": [
       { "name": "Crispy Chilli Chicken", "desc": "Crispy stir fry chicken seasoned with mix papers, chilli sauce and onions.", "price": 10.95, "emoji": "🌶️", "tags": ["hot", "new"] },
       { "name": "Szechuan Beef", "desc": "Stir fry spicy chilli, mix papers, garlic, leeks and basil with beef. Sweet spicy and complicated taste.", "price": 12.95, "emoji": "🥩", "tags": ["hot"] },
@@ -156,7 +157,7 @@ const MENU_FALLBACK = {
   },
   "desserts": {
     "label": "Desserts",
-    "img": "https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=1200&q=80",
+    "img": "https://images.unsplash.com/photo-1563805042-7684c019e1cb?auto=format&fit=crop&w=900&q=70",
     "items": [
       { "name": "Banana Fritters (Vegan)", "desc": "Four coated deep-fried bananas served with syrup & a scoop of vegan coconut sorbet.", "price": 5.95, "emoji": "🍌", "tags": ["veg"] },
       { "name": "Black Sesame Ice Cream", "desc": "Nutty, toasted sesame Japanese style handcrafted ice cream made London.", "price": 5.95, "emoji": "🍦" },
@@ -168,7 +169,7 @@ const MENU_FALLBACK = {
   },
   "drinks": {
     "label": "Drinks",
-    "img": "https://images.unsplash.com/photo-1544145945-f90425340c7e?w=1200&q=80",
+    "img": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=70",
     "items": [
       { "name": "Still Water",                          "price": 1.95 },
       { "name": "Sparkling Water",                      "price": 2.50 },
@@ -186,7 +187,7 @@ const MENU_FALLBACK = {
   },
   "kids": {
     "label": "Kids' Menu",
-    "img": "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=1200&q=80",
+    "img": "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?auto=format&fit=crop&w=900&q=70",
     "items": [
       { "name": "Fish Fingers & Chips",      "desc": "Crispy fish fingers served with chips.",        "price": 5.95, "emoji": "🐟" },
       { "name": "Chicken Nuggets & Chips",   "desc": "Crispy chicken nuggets served with chips.",     "price": 5.95, "emoji": "🍗" },

@@ -11,8 +11,9 @@
    ============================================================ */
 
 /* global module */
-/* exported BOOKING_RULES, isValidName, isValidUkPhone, isValidEmail,
+/* exported TEST_CARD_NUMBERS, validateTestCard, BOOKING_RULES, isValidName, isValidUkPhone, isValidEmail,
    isValidUkPostcode, toLocalDateString, validateBooking, validateOrderDetails */
+/* jshint strict: global */
 "use strict";
 
 const BOOKING_RULES = Object.freeze({
@@ -28,9 +29,9 @@ const BOOKING_RULES = Object.freeze({
    2–60 characters. */
 function isValidName(value) {
     const name = String(value || "").trim();
-    return name.length >= 2
-        && name.length <= 60
-        && /^[A-Za-zÀ-ÖØ-öø-ÿ][A-Za-zÀ-ÖØ-öø-ÿ' .-]*$/.test(name);
+    return name.length >= 2 &&
+        name.length <= 60 &&
+        /^[A-Za-zÀ-ÖØ-öø-ÿ][A-Za-zÀ-ÖØ-öø-ÿ' .-]*$/.test(name);
 }
 
 /* UK phone numbers: 0 or +44 followed by 9–10 digits.
@@ -134,12 +135,12 @@ function validateBooking(values, now) {
         errors.time = "Please enter a valid time.";
     } else if (minutes < opens || minutes > lastBooking) {
         errors.time = "We're open 4:30pm–11pm. Please choose a time between 4:30pm and 10:30pm.";
-    } else if (bookingDate && !errors.date
-            && bookingDate.getTime() === today.getTime()) {
+    } else if (bookingDate && !errors.date &&
+            bookingDate.getTime() === today.getTime()) {
         const nowMinutes = current.getHours() * 60 + current.getMinutes();
         if (minutes < nowMinutes + rules.MIN_NOTICE_MINUTES) {
-            errors.time = "Same-day bookings need at least "
-                + rules.MIN_NOTICE_MINUTES + " minutes' notice. Please choose a later time.";
+            errors.time = "Same-day bookings need at least " +
+                rules.MIN_NOTICE_MINUTES + " minutes' notice. Please choose a later time.";
         }
     }
 
@@ -150,8 +151,8 @@ function validateBooking(values, now) {
 
     /* Special requests (optional) */
     if (String(v.notes || "").length > rules.NOTES_MAX_LENGTH) {
-        errors.notes = "Please keep special requests under "
-            + rules.NOTES_MAX_LENGTH + " characters.";
+        errors.notes = "Please keep special requests under " +
+            rules.NOTES_MAX_LENGTH + " characters.";
     }
 
     return errors;
@@ -198,9 +199,73 @@ function validateOrderDetails(values) {
     return errors;
 }
 
+/* ── SIMULATED CARD PAYMENT ──
+   The card form is a demonstration only. To make sure nobody types in a
+   real card, only published payment-provider TEST numbers are accepted.
+   Nothing entered is stored or sent anywhere. */
+const TEST_CARD_NUMBERS = Object.freeze([
+    "4242424242424242",   /* Visa (test) */
+    "4000056655665556",   /* Visa debit (test) */
+    "5555555555554444"    /* Mastercard (test) */
+]);
+
+/* Luhn checksum used by all real card numbers */
+function passesLuhn(digits) {
+    let sum = 0;
+    for (let i = 0; i < digits.length; i += 1) {
+        let d = parseInt(digits.charAt(digits.length - 1 - i), 10);
+        if (i % 2 === 1) {
+            d *= 2;
+            if (d > 9) { d -= 9; }
+        }
+        sum += d;
+    }
+    return sum % 10 === 0;
+}
+
+/* Validate the simulated card form.
+   values : { number, expiry ("MM/YY"), cvc }
+   now    : Date — injected so tests can fix "today" */
+function validateTestCard(values, now) {
+    const errors = {};
+    const v = values || {};
+    const current = now || new Date();
+    const digits = String(v.number || "").replace(/[\s-]/g, "");
+
+    if (!digits) {
+        errors.number = "Please enter the test card number 4242 4242 4242 4242.";
+    } else if (!/^\d{16}$/.test(digits) || !passesLuhn(digits)) {
+        errors.number = "Card number must be 16 digits. Use the test card 4242 4242 4242 4242.";
+    } else if (TEST_CARD_NUMBERS.indexOf(digits) === -1) {
+        errors.number = "Demo site: real cards are not accepted. Use the test card 4242 4242 4242 4242.";
+    }
+
+    const exp = /^(\d{2})\s*\/\s*(\d{2})$/.exec(String(v.expiry || "").trim());
+    if (!v.expiry || !String(v.expiry).trim()) {
+        errors.expiry = "Please enter an expiry date (MM/YY).";
+    } else if (!exp || parseInt(exp[1], 10) < 1 || parseInt(exp[1], 10) > 12) {
+        errors.expiry = "Enter the expiry as MM/YY, e.g. 12/30.";
+    } else {
+        const month = parseInt(exp[1], 10);
+        const year = 2000 + parseInt(exp[2], 10);
+        /* A card is valid until the end of its expiry month */
+        if (new Date(year, month, 1) <= current) {
+            errors.expiry = "That expiry date has passed. Use any future date, e.g. 12/30.";
+        }
+    }
+
+    if (!/^\d{3}$/.test(String(v.cvc || "").trim())) {
+        errors.cvc = "Enter a 3-digit security code, e.g. 123.";
+    }
+
+    return errors;
+}
+
 /* Allow the automated tests to load this file in Node.js. */
 if (typeof module !== "undefined" && module.exports) {
     module.exports = {
+        TEST_CARD_NUMBERS: TEST_CARD_NUMBERS,
+        validateTestCard: validateTestCard,
         BOOKING_RULES: BOOKING_RULES,
         isValidName: isValidName,
         isValidUkPhone: isValidUkPhone,

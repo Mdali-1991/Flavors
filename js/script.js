@@ -17,7 +17,8 @@
 
 /* global MENU_FALLBACK, calculateOrderTotals, formatPounds,
    validateBooking, validateOrderDetails, toLocalDateString, BOOKING_RULES,
-   Stripe, gsap, ScrollTrigger, particlesJS */
+   validateTestCard, gsap, ScrollTrigger, particlesJS */
+/* jshint strict: global */
 "use strict";
 
 /* ── MODULE-SCOPED STATE ── */
@@ -36,8 +37,8 @@ let fetchedMenuData = null;
 let isFetching = false;
 
 /* True when the user's system asks for reduced motion. */
-const prefersReducedMotion = window.matchMedia
-    && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const prefersReducedMotion = window.matchMedia &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 const DEMO_SUFFIX = " This is a demo – nothing has been sent to the restaurant.";
 
@@ -163,13 +164,13 @@ function renderCart() {
         el.innerHTML = cart.map(function (item, i) {
             const lineTotal = formatPounds(Math.round(item.price * 100) * item.qty);
             const removeLabel = "Remove " + escapeHtml(item.name) + " from cart";
-            return "<div class=\"cart-item\">"
-                + "<span>" + item.qty + "× " + escapeHtml(item.name) + "</span>"
-                + "<span class=\"cart-item-controls\">"
-                + "<strong>" + lineTotal + "</strong>"
-                + "<button type=\"button\" class=\"cart-item-remove\" data-idx=\"" + i + "\""
-                + " aria-label=\"" + removeLabel + "\">✕</button>"
-                + "</span></div>";
+            return "<div class=\"cart-item\">" +
+                "<span>" + item.qty + "× " + escapeHtml(item.name) + "</span>" +
+                "<span class=\"cart-item-controls\">" +
+                "<strong>" + lineTotal + "</strong>" +
+                "<button type=\"button\" class=\"cart-item-remove\" data-idx=\"" + i + "\"" +
+                " aria-label=\"" + removeLabel + "\">✕</button>" +
+                "</span></div>";
         }).join("");
     }
 
@@ -202,9 +203,9 @@ function renderTotals() {
         } else if (!totals.canCheckout) {
             deliveryEl.textContent = "Not available";
         } else {
-            deliveryEl.textContent = totals.deliveryCharge === 0
-                ? "Free"
-                : formatPounds(totals.deliveryCharge);
+            deliveryEl.textContent = totals.deliveryCharge === 0 ?
+                "Free" :
+                formatPounds(totals.deliveryCharge);
         }
     }
 
@@ -255,24 +256,24 @@ function showMenuLoading(container) {
         return "<div class=\"skeleton-card\" aria-hidden=\"true\"></div>";
     }).join("");
 
-    container.innerHTML = "<div class=\"menu-loading\" role=\"status\""
-        + " aria-busy=\"true\" aria-label=\"Loading menu, please wait\">"
-        + "<p class=\"loading-text\">Loading menu…</p>"
-        + "<div class=\"skeleton-grid\">" + skeletonCards + "</div>"
-        + "</div>";
+    container.innerHTML = "<div class=\"menu-loading\" role=\"status\"" +
+        " aria-busy=\"true\" aria-label=\"Loading menu, please wait\">" +
+        "<p class=\"loading-text\">Loading menu…</p>" +
+        "<div class=\"skeleton-grid\">" + skeletonCards + "</div>" +
+        "</div>";
 }
 
 /* ── MENU: show user-facing error with retry button ── */
 
 function showMenuError(container, err) {
     const errorMsg = err && err.message ? err.message : "Unknown error";
-    container.innerHTML = "<div class=\"menu-error\" role=\"alert\">"
-        + "<p class=\"menu-error-heading\">"
-        + "⚠️ Sorry, the menu could not be loaded.</p>"
-        + "<p class=\"menu-error-body\">Please check your connection and try again.</p>"
-        + "<button type=\"button\" class=\"btn-primary\" id=\"retryMenuBtn\">↺ Retry</button>"
-        + "<p class=\"menu-error-detail\">Technical detail: " + escapeHtml(errorMsg) + "</p>"
-        + "</div>";
+    container.innerHTML = "<div class=\"menu-error\" role=\"alert\">" +
+        "<p class=\"menu-error-heading\">" +
+        "⚠️ Sorry, the menu could not be loaded.</p>" +
+        "<p class=\"menu-error-body\">Please check your connection and try again.</p>" +
+        "<button type=\"button\" class=\"btn-primary\" id=\"retryMenuBtn\">↺ Retry</button>" +
+        "<p class=\"menu-error-detail\">Technical detail: " + escapeHtml(errorMsg) + "</p>" +
+        "</div>";
 
     const retryBtn = document.getElementById("retryMenuBtn");
     if (retryBtn) {
@@ -321,16 +322,16 @@ function renderDishCard(item, options) {
         label = "Add " + nameSafe + " to cart, " + priceStr;
     }
 
-    return "<article class=\"menu-card tilt-card\">"
-        + "<div class=\"card-emoji\" aria-hidden=\"true\">" + emoji + "</div>"
-        + "<div class=\"card-body\">"
-        + "<h3>" + nameSafe + " " + tags + "</h3>"
-        + desc
-        + "<div class=\"card-footer\">"
-        + "<span class=\"card-price\"" + priceAttr + ">" + priceStr + "</span>"
-        + "<button type=\"button\" class=\"add-to-cart\"" + dataAttrs
-        + " aria-label=\"" + label + "\">+ Add</button>"
-        + "</div></div></article>";
+    return "<article class=\"menu-card tilt-card\">" +
+        "<div class=\"card-emoji\" aria-hidden=\"true\">" + emoji + "</div>" +
+        "<div class=\"card-body\">" +
+        "<h3>" + nameSafe + " " + tags + "</h3>" +
+        desc +
+        "<div class=\"card-footer\">" +
+        "<span class=\"card-price\"" + priceAttr + ">" + priceStr + "</span>" +
+        "<button type=\"button\" class=\"add-to-cart\"" + dataAttrs +
+        " aria-label=\"" + label + "\">+ Add</button>" +
+        "</div></div></article>";
 }
 
 /* ── MENU: render a drink item (a single native button) ── */
@@ -339,13 +340,13 @@ function renderDrinkItem(item) {
     const nameSafe = escapeHtml(item.name);
     const priceStr = formatPounds(Math.round(item.price * 100));
 
-    return "<button type=\"button\" class=\"drink-item\""
-        + " data-name=\"" + nameSafe + "\""
-        + " data-price=\"" + item.price + "\""
-        + " aria-label=\"Add " + nameSafe + " to cart, " + priceStr + "\">"
-        + "<span>🥤 " + nameSafe + "</span>"
-        + "<span class=\"drink-price\">" + priceStr + "</span>"
-        + "</button>";
+    return "<button type=\"button\" class=\"drink-item\"" +
+        " data-name=\"" + nameSafe + "\"" +
+        " data-price=\"" + item.price + "\"" +
+        " aria-label=\"Add " + nameSafe + " to cart, " + priceStr + "\">" +
+        "<span>🥤 " + nameSafe + "</span>" +
+        "<span class=\"drink-price\">" + priceStr + "</span>" +
+        "</button>";
 }
 
 /* ── MENU: render the protein selector dropdown ── */
@@ -353,25 +354,25 @@ function renderDrinkItem(item) {
 function renderProteinSelector(cat, pricingTable) {
     const options = pricingTable.map(function (row, i) {
         const selected = i === 0 ? " selected" : "";
-        return "<option value=\"" + escapeHtml(row.protein) + "\""
-            + selected + ">"
-            + escapeHtml(row.protein) + " — " + escapeHtml(row.price) + "</option>";
+        return "<option value=\"" + escapeHtml(row.protein) + "\"" +
+            selected + ">" +
+            escapeHtml(row.protein) + " — " + escapeHtml(row.price) + "</option>";
     }).join("");
 
-    return "<div class=\"protein-selector\">"
-        + "<label for=\"protein-" + cat + "\">"
-        + "🍽 Choose your protein</label>"
-        + "<select id=\"protein-" + cat + "\""
-        + " class=\"protein-select\""
-        + " data-cat=\"" + cat + "\""
-        + " aria-describedby=\"protein-price-" + cat + "\">"
-        + options
-        + "</select>"
-        + "<span class=\"protein-current-price\">"
-        + "Price: <strong id=\"protein-price-" + cat + "\""
-        + " aria-live=\"polite\">"
-        + escapeHtml(pricingTable[0].price) + "</strong></span>"
-        + "</div>";
+    return "<div class=\"protein-selector\">" +
+        "<label for=\"protein-" + cat + "\">" +
+        "🍽 Choose your protein</label>" +
+        "<select id=\"protein-" + cat + "\"" +
+        " class=\"protein-select\"" +
+        " data-cat=\"" + cat + "\"" +
+        " aria-describedby=\"protein-price-" + cat + "\">" +
+        options +
+        "</select>" +
+        "<span class=\"protein-current-price\">" +
+        "Price: <strong id=\"protein-price-" + cat + "\"" +
+        " aria-live=\"polite\">" +
+        escapeHtml(pricingTable[0].price) + "</strong></span>" +
+        "</div>";
 }
 
 /* ── MENU: update all displayed prices when protein changes ── */
@@ -379,9 +380,9 @@ function renderProteinSelector(cat, pricingTable) {
 function updateProteinPricing(cat, protein) {
     const price = getProteinPrice(cat, protein);
     const priceStr = formatPounds(Math.round(price * 100));
-    const catLabel = fetchedMenuData && fetchedMenuData[cat]
-        ? fetchedMenuData[cat].label
-        : cat;
+    const catLabel = fetchedMenuData && fetchedMenuData[cat] ?
+        fetchedMenuData[cat].label :
+        cat;
 
     const priceLabel = document.getElementById("protein-price-" + cat);
     if (priceLabel) { priceLabel.textContent = priceStr; }
@@ -413,9 +414,9 @@ function handleAddButton(btn) {
         const cat = btn.dataset.cat || "";
         const select = document.getElementById("protein-" + cat);
         const catData = fetchedMenuData && fetchedMenuData[cat];
-        const defaultProtein = catData && catData.pricingTable
-            ? catData.pricingTable[0].protein
-            : "";
+        const defaultProtein = catData && catData.pricingTable ?
+            catData.pricingTable[0].protein :
+            "";
         const protein = select ? select.value : defaultProtein;
         addToCart(name + " (" + protein + ")", getProteinPrice(cat, protein));
     } else {
@@ -482,35 +483,35 @@ function renderMenuPanels(container, data) {
         panel.setAttribute("role", "region");
         panel.setAttribute("aria-label", catData.label);
 
-        let html = "<img class=\"panel-hero-img\""
-            + " src=\"" + escapeHtml(catData.img) + "\""
-            + " alt=\"" + escapeHtml(catData.label) + " dishes\""
-            + " loading=\"lazy\">";
+        let html = "<img class=\"panel-hero-img\"" +
+            " src=\"" + escapeHtml(catData.img) + "\"" +
+            " alt=\"" + escapeHtml(catData.label) + " dishes\"" +
+            " loading=\"lazy\">";
 
         if (catData.pricingTable) {
             html += renderProteinSelector(cat, catData.pricingTable);
         }
 
         if (cat === "drinks") {
-            html += "<div class=\"drinks-list\">"
-                + catData.items.map(renderDrinkItem).join("")
-                + "</div>";
+            html += "<div class=\"drinks-list\">" +
+                catData.items.map(renderDrinkItem).join("") +
+                "</div>";
         } else if (catData.pricingTable) {
             const defaultProtein = catData.pricingTable[0].protein;
             const defaultPrice = parsePrice(catData.pricingTable[0].price);
-            html += "<div class=\"menu-grid\">"
-                + catData.items.map(function (item) {
+            html += "<div class=\"menu-grid\">" +
+                catData.items.map(function (item) {
                     return renderDishCard(item, {
                         cat: cat, protein: defaultProtein, price: defaultPrice
                     });
-                }).join("")
-                + "</div>";
+                }).join("") +
+                "</div>";
         } else {
-            html += "<div class=\"menu-grid\">"
-                + catData.items.map(function (item) {
+            html += "<div class=\"menu-grid\">" +
+                catData.items.map(function (item) {
                     return renderDishCard(item, { price: item.price });
-                }).join("")
-                + "</div>";
+                }).join("") +
+                "</div>";
         }
 
         panel.innerHTML = html;
@@ -541,15 +542,15 @@ async function buildMenu() {
     try {
         const response = await fetch("assets/data/menu.json");
         if (!response.ok) {
-            throw new Error("Server returned " + response.status
-                + " " + response.statusText);
+            throw new Error("Server returned " + response.status +
+                " " + response.statusText);
         }
         data = await response.json();
     } catch (fetchError) {
         if (fetchError instanceof TypeError && typeof MENU_FALLBACK !== "undefined") {
             console.warn(
-                "fetch() unavailable — using inline menu data. "
-                + "(" + fetchError.message + ")"
+                "fetch() unavailable — using inline menu data. " +
+                "(" + fetchError.message + ")"
             );
             data = MENU_FALLBACK;
         } else {
@@ -745,10 +746,10 @@ function initTilt() {
             const dy = (event.clientY - cy) / rect.height;
             const dist = Math.sqrt(dx * dx + dy * dy);
             if (dist < 0.8) {
-                card.style.transform = "perspective(600px)"
-                    + " rotateY(" + (dx * 8) + "deg)"
-                    + " rotateX(" + (-dy * 8) + "deg)"
-                    + " translateY(-4px)";
+                card.style.transform = "perspective(600px)" +
+                    " rotateY(" + (dx * 8) + "deg)" +
+                    " rotateX(" + (-dy * 8) + "deg)" +
+                    " translateY(-4px)";
             } else {
                 card.style.transform = "";
             }
@@ -868,6 +869,18 @@ function showPaymentMessage(text, type) {
     msg.className = type;
 }
 
+/* Show the demo order confirmation and bring it into view.
+   On a phone the message sits below the payment buttons, so it is
+   scrolled into view and focused (screen readers then read it). */
+function showOrderConfirmation(text) {
+    const msg = document.getElementById("paymentMessage");
+    showPaymentMessage(text, "success");
+    if (!msg) { return; }
+    msg.setAttribute("tabindex", "-1");
+    msg.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "center" });
+    msg.focus({ preventScroll: true });
+}
+
 /* Checks the cart AND the customer details before any (simulated)
    payment. Returns true only when the order can be placed. */
 function validateOrder() {
@@ -901,14 +914,14 @@ function buildOrderConfirmation(paymentLabel) {
         breakdown += ", collection discount " + formatPounds(-totals.discount);
     }
     if (!isCollection) {
-        breakdown += ", delivery " + (totals.deliveryCharge === 0
-            ? "free"
-            : formatPounds(totals.deliveryCharge));
+        breakdown += ", delivery " + (totals.deliveryCharge === 0 ?
+            "free" :
+            formatPounds(totals.deliveryCharge));
     }
-    return "✅ DEMO " + (isCollection ? "collection" : "delivery")
-        + " order (" + paymentLabel + ") – total " + formatPounds(totals.total)
-        + " (" + breakdown + ")." + DEMO_SUFFIX
-        + " No payment has been taken. To order for real, call 020 3883 9233.";
+    return "✅ DEMO " + (isCollection ? "collection" : "delivery") +
+        " order (" + paymentLabel + ") – total " + formatPounds(totals.total) +
+        " (" + breakdown + ")." + DEMO_SUFFIX +
+        " No payment has been taken. To order for real, call 020 3883 9233.";
 }
 
 function resetOrder() {
@@ -952,9 +965,9 @@ function initLiveFieldChecks(fieldMap, validateFn) {
     Object.keys(fieldMap).forEach(function (key) {
         const input = fieldMap[key];
         if (!input) { return; }
-        const eventName = input.type === "checkbox" || input.tagName === "SELECT"
-            ? "change"
-            : "input";
+        const eventName = input.type === "checkbox" || input.tagName === "SELECT" ?
+            "change" :
+            "input";
         input.addEventListener(eventName, function () {
             if (input.getAttribute("aria-invalid") !== "true") { return; }
             const errors = validateFn();
@@ -963,106 +976,114 @@ function initLiveFieldChecks(fieldMap, validateFn) {
     });
 }
 
-/* ── STRIPE (TEST MODE – SIMULATED PAYMENT) ──
-   This is a static front-end project with no server, so a real
-   PaymentIntent cannot be created and NO card is ever charged.
-   Stripe Elements is used only to demonstrate the card-entry UI.
-   The key below is a placeholder test publishable key. */
+/* ── SIMULATED CARD PAYMENT ──
+   This is a static front-end project with no server, so no real payment
+   can be taken. The card form is a demonstration: it is validated by
+   validateTestCard() (js/form-rules.js), which accepts ONLY published
+   test card numbers such as 4242 4242 4242 4242, so a real card can never
+   be "accepted". Nothing typed into it is stored or sent anywhere.
+   (The first submission used Stripe Elements with a placeholder key; it
+   could fail silently, so it was replaced — see README Bug Log #23.) */
 
-const STRIPE_TEST_PK = "pk_test_51000000000000000000000000000000000000000"
-    + "0000000000000000000000000000000000000000000000000000000000";
+function getCardFields() {
+    return {
+        number: document.getElementById("cardNumber"),
+        expiry: document.getElementById("cardExpiry"),
+        cvc: document.getElementById("cardCvc")
+    };
+}
 
-let stripe;
-let cardElement;
-let cardMounted = false;
-let cardComplete = false;
+function readCardValues() {
+    const f = getCardFields();
+    return {
+        number: f.number ? f.number.value : "",
+        expiry: f.expiry ? f.expiry.value : "",
+        cvc: f.cvc ? f.cvc.value : ""
+    };
+}
 
-function initPayments() {
-    const stripeBtn = document.getElementById("stripePayBtn");
-    const cashBtn = document.getElementById("cashPayBtn");
-    const confirmBtn = document.getElementById("confirmPayBtn");
-    const stripeWrap = document.getElementById("stripeWrap");
-    if (!stripeBtn || !cashBtn) { return; }
-
-    function hideCardForm() {
-        if (stripeWrap) { stripeWrap.hidden = true; }
-        stripeBtn.hidden = false;
-    }
-
-    stripeBtn.addEventListener("click", function () {
-        if (!validateOrder()) { return; }
-
-        if (typeof Stripe === "undefined") {
-            showPaymentMessage(
-                "The card payment demo could not load (Stripe.js unavailable). "
-                + "Please use the cash option instead.", "error"
-            );
-            return;
-        }
-        try {
-            if (!stripe) {
-                stripe = Stripe(STRIPE_TEST_PK);
-                cardElement = stripe.elements().create("card", {
-                    hidePostalCode: true,
-                    style: {
-                        base: {
-                            color: "#F5F0E8",
-                            fontSize: "16px",
-                            "::placeholder": { color: "#9A9080" }
-                        }
-                    }
-                });
-                cardElement.on("change", function (event) {
-                    cardComplete = event.complete;
-                    if (event.error) {
-                        showPaymentMessage(event.error.message, "error");
-                    } else {
-                        showPaymentMessage("", "");
-                    }
-                });
-            }
-            if (!cardMounted) {
-                cardElement.mount("#stripe-card-element");
-                cardMounted = true;
-            }
-        } catch (err) {
-            showPaymentMessage(
-                "The card payment demo could not start: " + err.message
-                + " Please use the cash option instead.", "error"
-            );
-            return;
-        }
-
-        if (stripeWrap) { stripeWrap.hidden = false; }
-        stripeBtn.hidden = true;
-        showPaymentMessage("", "");
-    });
-
-    if (confirmBtn) {
-        confirmBtn.addEventListener("click", function () {
-            if (!validateOrder()) { return; }
-            if (!cardComplete) {
-                showPaymentMessage(
-                    "Please complete the test card details (e.g. 4242 4242 4242 4242).",
-                    "error"
-                );
-                return;
-            }
-            /* Simulated: no PaymentIntent is created, nothing is charged. */
-            showPaymentMessage(buildOrderConfirmation("simulated card payment"), "success");
-            if (cardElement) { cardElement.clear(); }
-            cardComplete = false;
-            hideCardForm();
-            resetOrder();
+/* Tidy card input as the user types: "4242424242424242" → "4242 4242 4242 4242",
+   "1230" → "12/30", digits only in the security code. */
+function initCardFormatting() {
+    const f = getCardFields();
+    if (f.number) {
+        f.number.addEventListener("input", function () {
+            const digits = f.number.value.replace(/\D/g, "").slice(0, 16);
+            f.number.value = digits.replace(/(\d{4})(?=\d)/g, "$1 ");
         });
     }
+    if (f.expiry) {
+        f.expiry.addEventListener("input", function (event) {
+            const digits = f.expiry.value.replace(/\D/g, "").slice(0, 4);
+            const deleting = event.inputType && event.inputType.indexOf("delete") === 0;
+            f.expiry.value = digits.length > 2 || (digits.length === 2 && !deleting) ?
+                digits.slice(0, 2) + "/" + digits.slice(2) :
+                digits;
+        });
+    }
+    if (f.cvc) {
+        f.cvc.addEventListener("input", function () {
+            f.cvc.value = f.cvc.value.replace(/\D/g, "").slice(0, 3);
+        });
+    }
+}
+
+function initPayments() {
+    const cardBtn = document.getElementById("cardPayBtn");
+    const cashBtn = document.getElementById("cashPayBtn");
+    const cardForm = document.getElementById("cardForm");
+    if (!cardBtn || !cashBtn || !cardForm) { return; }
+
+    function setCardFormOpen(open) {
+        cardForm.hidden = !open;
+        cardBtn.setAttribute("aria-expanded", open ? "true" : "false");
+        if (!open) {
+            cardForm.reset();
+            applyFieldErrors(getCardFields(), {});
+        }
+    }
+
+    cardBtn.addEventListener("click", function () {
+        if (!validateOrder()) { return; }
+        showPaymentMessage("", "");
+        setCardFormOpen(true);
+        const f = getCardFields();
+        cardForm.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "center" });
+        if (f.number) { f.number.focus({ preventScroll: true }); }
+    });
+
+    cardForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+        if (!validateOrder()) { return; }
+
+        const errors = validateTestCard(readCardValues(), new Date());
+        const firstInvalid = applyFieldErrors(getCardFields(), errors);
+        if (firstInvalid) {
+            showPaymentMessage("Payment not taken. Please correct the card details above.", "error");
+            firstInvalid.focus();
+            return;
+        }
+
+        /* Simulated: nothing is charged. Build the message BEFORE the cart is
+           reset, reset everything, then show it last so nothing overwrites it. */
+        const confirmation = buildOrderConfirmation("simulated card payment");
+        setCardFormOpen(false);
+        resetOrder();
+        showOrderConfirmation(confirmation);
+    });
 
     cashBtn.addEventListener("click", function () {
         if (!validateOrder()) { return; }
-        showPaymentMessage(buildOrderConfirmation("pay cash on "
-            + (getOrderType() === "collection" ? "collection" : "delivery")), "success");
-        hideCardForm();
+        const confirmation = buildOrderConfirmation("pay cash on " +
+            (getOrderType() === "collection" ? "collection" : "delivery"));
+        setCardFormOpen(false);
         resetOrder();
+        showOrderConfirmation(confirmation);
+    });
+
+    initCardFormatting();
+    initLiveFieldChecks(getCardFields(), function () {
+        return validateTestCard(readCardValues(), new Date());
     });
 }
 
@@ -1123,8 +1144,8 @@ function submitBooking(event) {
 
     if (firstInvalid) {
         if (msg) {
-            msg.innerHTML = "<p class=\"booking-error\">Your booking has not been sent. Please correct "
-                + errorCount + (errorCount === 1 ? " field" : " fields") + " above.</p>";
+            msg.innerHTML = "<p class=\"booking-error\">Your booking has not been sent. Please correct " +
+                errorCount + (errorCount === 1 ? " field" : " fields") + " above.</p>";
         }
         firstInvalid.focus();
         return;
@@ -1132,13 +1153,13 @@ function submitBooking(event) {
 
     const guestsText = values.guests === "1" ? "1 guest" : values.guests + " guests";
     if (msg) {
-        msg.innerHTML = "<div class=\"booking-success\">"
-            + "✅ DEMO booking request for " + escapeHtml(values.name.trim()) + ": "
-            + guestsText + ", " + escapeHtml(formatBookingDateTime(values.date, values.time)) + ".<br>"
-            + "<strong>This is a simulation – no table has been reserved and nothing has been sent to the restaurant.</strong><br>"
-            + "To book for real, call "
-            + "<a href=\"tel:02038839233\" class=\"booking-phone\">020 3883 9233</a>."
-            + "</div>";
+        msg.innerHTML = "<div class=\"booking-success\">" +
+            "✅ DEMO booking request for " + escapeHtml(values.name.trim()) + ": " +
+            guestsText + ", " + escapeHtml(formatBookingDateTime(values.date, values.time)) + ".<br>" +
+            "<strong>This is a simulation – no table has been reserved and nothing has been sent to the restaurant.</strong><br>" +
+            "To book for real, call " +
+            "<a href=\"tel:02038839233\" class=\"booking-phone\">020 3883 9233</a>." +
+            "</div>";
     }
     event.target.reset();
     applyFieldErrors(getBookingFields(), {});
@@ -1165,13 +1186,15 @@ function initBookingForm() {
 
 /* ── PAGE LOADER ── */
 
+/* Hide the brand loader shortly after the page is ready. It used to wait
+   for every image, font and the map to finish downloading ("load") plus
+   1.6 s, which kept phones on a blank screen for several seconds
+   (Lighthouse performance fix). This runs from DOMContentLoaded. */
 function initLoader() {
-    window.addEventListener("load", function () {
-        setTimeout(function () {
-            const loader = document.getElementById("loader");
-            if (loader) { loader.classList.add("hidden"); }
-        }, prefersReducedMotion ? 0 : 1600);
-    });
+    setTimeout(function () {
+        const loader = document.getElementById("loader");
+        if (loader) { loader.classList.add("hidden"); }
+    }, prefersReducedMotion ? 0 : 400);
 }
 
 /* ── SCROLL-TO-TOP BUTTON (styles in css/style.css → .scroll-top) ── */
